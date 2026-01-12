@@ -12,13 +12,84 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
-
-model User {
-  userId          Int     @id @default(cuid())
-  email       String  @unique
-  password    String
-  firstName   String
-  lastName    String
+enum JobLevel {
+  INTERN
+  JUNIOR
+  MID
+  SENIOR
+  LEAD
 }
 
+enum EmploymentType {
+  FULL_TIME
+  PART_TIME
+  CONTRACT
+  TEMPORARY
+}
+
+enum WorkMode {
+  REMOTE
+  HYBRID
+  IN_PERSON
+}
+
+enum PayPeriod {
+  HOURLY
+  YEARLY
+}
+
+enum JobSearchStatus {
+  ACTIVE
+  CASUAL
+  NOT_LOOKING
+}
+
+// is this well defined? need to ask some questions
+enum CompanyStage {
+
+  Early_Stage 
+  Startups
+  Public_Tech
+  Faang
+
+}
+
+model User {
+  id          String     @id @default(cuid()) // User id
+  email       String      @unique
+  password    String
+  firstName   String?
+  lastName    String?
+
+  profile   UserProfile? // This will be an object type that we define
+  
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt  @default(now())
+}
+
+
+model UserProfile {
+  id                String @id @default(cuid()) // id for profile
+  userId            String @unique // refers back to user id
+  user              User   @relation(fields: [userId], references: [id]) // one to one relation --> profile.userId to User.id
+
+  graduationYear    Int?
+  skills            String[]
+
+  jobLevels         JobLevel[]
+  employmentTypes   EmploymentType[]
+  workModes         WorkMode[]
+  preferredLocations String[]
+
+  companyStages     CompanyStage[]
+  jobRoles          String[]
+  industries        String[]
+
+  minimumPay        Int?
+  payPeriod         PayPeriod?
+
+  resumeUrl         String?
+  jobStatus         JobSearchStatus
+
+}
 
