@@ -1,5 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
+import { hash } from 'bcrypt'
+
 import "dotenv/config";
 
 const adapter = new PrismaPg({
@@ -9,13 +11,15 @@ const adapter = new PrismaPg({
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
+  const password = await hash('test', 12) // Replace with actual hashing function
   const user = await prisma.user.upsert({
     where: { email: 'test@test.com' },
     update: {},
     create: {
       email: 'test@test.com',
-      name: 'Test User',
-      password: '$2y$12$GBfcgD6XwaMferSOdYGiduw3Awuo95QAPhxFE0oNJ.Ds8qj3pzEZy', // hashed password
+      firstName: 'Test',
+      lastName: 'User',
+      password
     },
   })
   console.log({ user })
