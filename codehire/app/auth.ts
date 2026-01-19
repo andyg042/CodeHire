@@ -10,16 +10,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
 
     CredentialsProvider({
-        name: "Sign in",
-        credentials: {
-            email: { label: "Email", type: "email", placeholder: "you@example.com" },
-            password: { label: "Password", type: "password" },
-        },
-        async authorize(credentials) {
-            // Handle Auth!
-            const user = { id: "1", name: "Andy", email: "test@test.com" }
-            return user
-        },
+      name: "Sign in",
+      credentials: {
+        email: { label: "Email", type: "email", placeholder: "you@example.com" },
+        password: { label: "Password", type: "password" },
+      },
+      async authorize(credentials) {
+        // Handle Auth!
+        const user = { id: "1", name: "Andy", email: "test@test.com" }
+        return user
+      },
     }),
   ],
   secret: process.env.NEXTAUTH_SECRET,
