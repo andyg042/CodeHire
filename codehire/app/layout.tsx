@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
+import { JetBrains_Mono } from 'next/font/google'
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -12,6 +13,11 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
+
+const jetbrains = JetBrains_Mono({
+  subsets: ['latin'],
+  weight: ['400', '500', '700'],
+})
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -29,5 +35,6 @@ export default function RootLayout({
         <Providers>{children}</Providers>
       </body>
     </html>
+
   );
 }

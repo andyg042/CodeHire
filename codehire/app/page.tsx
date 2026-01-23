@@ -4,6 +4,9 @@ import Link from 'next/link'
 import { auth } from '@/app/api/auth/[...nextauth]/route'
 import { User } from './user'
 import { LogoutButton, LoginButton } from './auth'
+import Hero from './components/hero'
+import HowItWorks from './components/howItWorks'
+
 
 export default async function HomePage() {
   const session = await auth()
@@ -27,6 +30,13 @@ export default async function HomePage() {
     <h2>Client Call</h2>
     <User />
     <p> This is the HomePage</p>
+
+
+
+    <Hero />
+    <HowItWorks />
+
+
   </div>
   )
 }
