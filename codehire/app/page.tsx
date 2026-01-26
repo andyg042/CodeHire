@@ -3,7 +3,7 @@ import Navbar from "./components/navbar"
 import Link from 'next/link'
 import { auth } from '@/app/api/auth/[...nextauth]/route'
 import { User } from './user'
-import { LogoutButton, LoginButton } from './auth'
+import { LogoutButton, LoginButton } from './auth-buttons'
 import Hero from './components/hero'
 import HowItWorks from './components/howItWorks'
 
@@ -22,7 +22,9 @@ export default async function HomePage() {
     <LogoutButton />
 
     <h1>Welcome to CodeHire</h1>
-    {user ? <p>Logged in as {user.email}</p> : <p>Please log in.</p>}
+    {session ? <p>Logged in as {session.user?.email}</p> : <p>Please log in.</p>}
+
+    {/* {user ? <p>Logged in as {user.email}</p> : <p>Please log in.</p>} */}
     <h1> Welcome to the home HomePage  </h1>
 
     <h2>Server Session</h2>
@@ -32,7 +34,7 @@ export default async function HomePage() {
     <p> This is the HomePage</p>
 
 
-    <Navbar />
+    <Navbar session={session} />
     <Hero />
     <HowItWorks />
 
