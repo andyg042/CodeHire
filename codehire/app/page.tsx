@@ -32,7 +32,7 @@ export default async function HomePage() {
     <p> This is the HomePage</p>
 
 
-
+    <Navbar />
     <Hero />
     <HowItWorks />
 
