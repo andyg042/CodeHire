@@ -18,9 +18,8 @@ export default async function HomePage() {
     }
   })
   return (<div>
-    <LoginButton />
-    <LogoutButton />
 
+    <div></div>
     <h1>Welcome to CodeHire</h1>
     {session ? <p>Logged in as {session.user?.email}</p> : <p>Please log in.</p>}
 
