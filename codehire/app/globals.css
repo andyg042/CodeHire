@@ -1,11 +1,10 @@
 /* app/globals.css */
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
 
-* {
-    margin: 0;
-    padding: 0;
+/* * {
     box-sizing: border-box;
-}
+} */
 
 :root {
     /* Color Palette */
@@ -27,17 +26,6 @@
 
 }
 
-/* Button Reset - Remove all default browser button styles */
-/* Better Button Reset - Only reset what we need */
-button {
-    border: none;
-    background: none;
-    padding: 0;
-    margin: 0;
-    font: inherit;
-    cursor: pointer;
-    outline: inherit;
-}
 
 body {
     font-family: 'JetBrains Mono', monospace;

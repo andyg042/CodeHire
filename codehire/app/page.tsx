@@ -19,18 +19,19 @@ export default async function HomePage() {
   })
   return (<div>
 
-    <div></div>
-    <h1>Welcome to CodeHire</h1>
-    {session ? <p>Logged in as {session.user?.email}</p> : <p>Please log in.</p>}
+    <div style={{ padding: "100px 20px" }}>
+      <h1 className="text-4xl font-bold">Welcome to CodeHire</h1>
+      {session ? <p>Logged in as {session.user?.email}</p> : <p>Please log in.</p>}
 
-    {/* {user ? <p>Logged in as {user.email}</p> : <p>Please log in.</p>} */}
-    <h1> Welcome to the home HomePage  </h1>
+      {/* {user ? <p>Logged in as {user.email}</p> : <p>Please log in.</p>} */}
+      <h1 className="text-4xl font-bold"> Welcome to the home HomePage  </h1>
 
-    <h2>Server Session</h2>
-    <pre>{JSON.stringify(session)}</pre>
-    <h2>Client Call</h2>
-    <User />
-    <p> This is the HomePage</p>
+      <h2 className="text-3xl font-bold">Server Session</h2>
+      <pre>{JSON.stringify(session)}</pre>
+      <h2 className="text-3xl font-bold">Client Call</h2>
+      <User />
+      <p> This is the HomePage</p>
+    </div>
 
 
     <Navbar session={session} />
