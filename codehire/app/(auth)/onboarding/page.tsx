@@ -1,6 +1,8 @@
 'use client';
 import React, { useState } from 'react';
 import AutocompleteInput from '../../components/AutocompleteInput';
+import BadgeSelector from '../../components/BadgeSelector';
+
 
 
 
@@ -10,7 +12,7 @@ interface OnboardingFormData {
     major: string;
     graduationYear: number;
     graduationMonth: string;
-    jobTitle: string;
+    jobTitles: [];
     experienceLevel: string;
     jobPreferences: {
         fullTime: boolean;
@@ -44,11 +46,11 @@ interface OnboardingFormData {
 // Initial form state
 const initialFormData: OnboardingFormData = {
     name: '',
-    jobTitle: '',
+    major: '',
     graduationMonth: '',
     graduationYear: 0,
+    jobTitles: [],
     experienceLevel: '',
-    major: '',
     jobPreferences: {
         fullTime: false,
         partTime: false,
@@ -85,6 +87,10 @@ export default function OnboardingPage() {
     const [selectedFruit, setSelectedFruit] = useState('');
     const [selectedCountry, setSelectedCountry] = useState('');
     const [selectedMajor, setSelectedMajor] = useState('');
+    const [selectedJobs, setSelectedJobs] = useState<string[]>([]);
+    const [selectedCodingLanguages, setSelectedCodingLanguages] = useState<string[]>([]);
+    const [selectedIndustries, setSelectedIndustries] = useState<string[]>([]);
+
 
     const majors = [
         'Artificial Intelligence (AI) & Machine Learning',
@@ -105,20 +111,45 @@ export default function OnboardingPage() {
         'Software Engineering/Development',
         'Web Development/Frontend/Backend']
 
-    const fruits = [
-        'Apple',
-        'Apricot',
-        'Banana',
-        'Blueberry',
-        'Cherry',
-        'Grape',
-        'Mango',
-        'Orange',
-        'Peach',
-        'Pear',
-        'Pineapple',
-        'Strawberry',
-        'Watermelon',
+    const JOB_TITLES = [
+        'AI/Machine Learning Engineer',
+        'Business Systems Analyst',
+        'Chief Technology Officer (CTO)/Chief Information Officer (CIO)',
+        'Cloud Engineer/Architect',
+        'Computer Systems Analyst',
+        'Data Analyst/Engineer',
+        'Data Scientist',
+        'Database Administrator (DBA)',
+        'DevOps Engineer/SRE',
+        'Information Security Analyst/Cybersecurity Specialist',
+        'IT Manager/Director',
+        'Network Engineer/Architect',
+        'Product Manager',
+        'QA Engineer',
+        'Software Engineer/Developer',
+        'Technical Support Specialist/Engineer',
+        'UX/UI Designer',
+        'Web Developer']
+
+    const CODING_LANGUAGES = [
+        'JavaScript',
+        'TypeScript',
+        'Python',
+        'Java',
+        'C++',
+        'C#',
+        'Ruby',
+        'React',
+        'HTML',
+        'CSS',
+        'Go',
+        'Rust',
+        'Swift',
+        'Kotlin',
+        'PHP',
+        'SQL',
+        'R',
+        'Scala',
     ];
 
     const countries = [
@@ -136,6 +167,26 @@ export default function OnboardingPage() {
         'Brazil',
         'Mexico',
     ];
+
+    const INDUSTRIES = [
+        'Aerospace',
+        'Arts & Entertainment',
+        'Construction',
+        'Defense',
+        'Education',
+        'Energy',
+        'Finance & Insurance',
+        'Government/Public Administration',
+        'Healthcare',
+        'Hospitality & Tourism',
+        'Information Technology',
+        'Manufacturing',
+        'Media & Communication',
+        'Professional & Business Services',
+        'Real Estate',
+        'Retail',
+        'Transportation & Logistics',
+    ]
 
     // Update text input fields
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -223,7 +274,7 @@ export default function OnboardingPage() {
     // Form submission
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        console.log('Form submitted:', formData, { selectedFruit, selectedCountry });
+        console.log('Form submitted:', formData, { selectedMajor, selectedCountry });
         // Add your submission logic here (API call, etc.)
         alert('Onboarding form submitted successfully!');
         alert(`Fruit: ${selectedFruit}\nCountry: ${selectedCountry}`);
@@ -311,7 +362,7 @@ export default function OnboardingPage() {
                                             />
                                         </div> */}
 
-                                        <div>
+                                        {/* <div>
                                             <label htmlFor="major" className="block text-sm font-medium text-white mb-2">
                                                 Major *
                                             </label>
@@ -325,48 +376,20 @@ export default function OnboardingPage() {
                                                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                                 placeholder=""
                                             />
-                                        </div>
+                                        </div> */}
 
 
-                                        <form onSubmit={handleSubmit} className="block text-sm font-medium text-white mb-2">
-                                            <AutocompleteInput
-                                                label="Major"
-                                                options={majors}
-                                                value={selectedMajor}
-                                                onChange={setSelectedMajor}
-                                                placeholder="e.g., Computer Science, Software Engineering..."
-                                                maxSuggestions={5}
-                                            />
-
-                                            <AutocompleteInput
-                                                label="Country"
-                                                options={countries}
-                                                value={selectedCountry}
-                                                onChange={setSelectedCountry}
-                                                placeholder="e.g., United States, Canada, or your own..."
-                                                maxSuggestions={5}
-                                            />
-
-                                            <button
-                                                type="submit"
-                                                className="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 px-4 rounded-lg transition"
-                                            >
-                                                Submit
-                                            </button>
-                                        </form>
-
-                                        {/* {(selectedFruit || selectedCountry) && (
-                                                    <div className="mt-8 p-4 bg-gray-100 rounded-lg">
-                                                        <h3 className="font-semibold text-gray-700 mb-2">Current Values:</h3>
-                                                        <p className="text-gray-600">
-                                                            <strong>Fruit:</strong> {selectedFruit || '(not selected)'}
-                                                        </p>
-                                                        <p className="text-gray-600">
-                                                            <strong>Country:</strong> {selectedCountry || '(not selected)'}
-                                                        </p>
-                                                    </div>
-                                                )} */}
-
+                                        <label htmlFor="name" className="block text-sm font-medium text-white mb-2">
+                                            Major
+                                        </label>
+                                        <AutocompleteInput
+                                            label="Major"
+                                            options={majors}
+                                            value={selectedMajor}
+                                            onChange={setSelectedMajor}
+                                            placeholder="e.g., Computer Science, Software Engineering..."
+                                            maxSuggestions={5}
+                                        />
 
                                         <div>
                                             <label className="block text-sm font-medium text-white mb-2">
@@ -430,7 +453,7 @@ export default function OnboardingPage() {
                                             JOB PREFERENCES
                                         </h2>
 
-                                        <div>
+                                        {/* <div>
                                             <label htmlFor="jobTitle" className="block text-sm font-medium text-white mb-2">
                                                 Desired Job Title *
                                             </label>
@@ -438,13 +461,33 @@ export default function OnboardingPage() {
                                                 type="text"
                                                 id="jobTitle"
                                                 name="jobTitle"
-                                                value={formData.jobTitle}
+                                                value={formData.jobTitles}
                                                 onChange={handleInputChange}
                                                 required
                                                 className="w-full px-4 py-2 border border-white rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                                 placeholder="Software Engineer"
                                             />
+                                        </div> */}
+
+                                        <div>
+                                            <label htmlFor="jobTitles" className="block text-sm font-bold text-white mb-2">
+                                                Job Titles
+                                            </label>
+                                            {/* Job Titles Section */}
+                                            <div className="pb-6 border-b border-gray-200">
+                                                <BadgeSelector
+                                                    options={JOB_TITLES}
+                                                    selectedItems={selectedJobs}
+                                                    onSelectionChange={setSelectedJobs}
+                                                    placeholder="Search job titles..."
+                                                    // label="Job Titles"
+                                                    description="What types of roles are you interested in?"
+                                                    maxSuggestions={5}
+                                                    allowCustom={true}
+                                                />
+                                            </div>
                                         </div>
+
 
                                         <div>
                                             <label htmlFor="experienceLevel" className="block text-sm font-bold text-white mb-2">
@@ -597,35 +640,48 @@ export default function OnboardingPage() {
                                                     />
                                                     <span className="ml-2 text-white">Public Tech</span>
                                                 </label>
-                                                <label className="flex items-center">
-                                                    <input
-                                                        type="checkbox"
-                                                        name="inPerson"
-                                                        checked={formData.companyStages.faang}
-                                                        onChange={handleCompanyStagesChange}
-                                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-white rounded"
-                                                    />
-                                                    <span className="ml-2 text-white">In Person</span>
-                                                </label>
 
                                             </div>
                                         </div>
 
+
                                         <div>
-                                            <label htmlFor="location" className="block text-sm font-medium text-white mb-2">
-                                                Location *
+                                            <label htmlFor="name" className="block text-sm font-medium text-white mb-2 ">
+                                                Country
                                             </label>
-                                            <input
-                                                type="text"
-                                                id="location"
-                                                name="location"
-                                                value={formData.location}
-                                                onChange={handleInputChange}
-                                                required
-                                                className="w-full px-4 py-2 border border-white rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                                placeholder="San Francisco, CA"
+                                            <AutocompleteInput
+                                                label="Country"
+                                                options={countries}
+                                                value={selectedCountry}
+                                                onChange={setSelectedCountry}
+                                                placeholder="e.g., United States, Canada, or your own..."
+                                                maxSuggestions={5}
                                             />
                                         </div>
+
+
+                                        <div>
+                                            <label htmlFor="industries" className="block text-sm font-bold text-white mb-2">
+                                                Industries
+                                            </label>
+                                            {/* Industries Section */}
+                                            <div className="pb-6 border-b border-gray-200">
+                                                <BadgeSelector
+                                                    options={INDUSTRIES}
+                                                    selectedItems={selectedIndustries}
+                                                    onSelectionChange={setSelectedIndustries}
+                                                    placeholder="Search industries titles..."
+                                                    // label="Job Titles"
+                                                    description="What types of industries do you want to work in??"
+                                                    maxSuggestions={5}
+                                                    allowCustom={true}
+                                                />
+                                            </div>
+                                        </div>
+
+
+
+
 
                                         {/* TODO: add pay and pay period here */}
                                     </div>
@@ -638,7 +694,7 @@ export default function OnboardingPage() {
                                             SKILLS & RESUME
                                         </h2>
 
-                                        <div>
+                                        {/* <div>
                                             <label className="block text-sm font-medium text-white mb-2">
                                                 Skills *
                                             </label>
@@ -675,6 +731,26 @@ export default function OnboardingPage() {
                                                         </button>
                                                     </span>
                                                 ))}
+                                            </div>
+                                        </div> */}
+
+
+                                        <div>
+                                            <label htmlFor="experienceLevel" className="block text-sm font-bold text-white mb-2">
+                                                Coding Languages
+                                            </label>
+                                            {/* Coding languages section */}
+                                            <div className="pb-6 border-b border-gray-200">
+                                                <BadgeSelector
+                                                    options={CODING_LANGUAGES}
+                                                    selectedItems={selectedCodingLanguages}
+                                                    onSelectionChange={setSelectedCodingLanguages}
+                                                    placeholder="Search coding languages..."
+                                                    // label="cCding Languages
+                                                    // description="What types of roles are you interested in?"
+                                                    maxSuggestions={5}
+                                                    allowCustom={true}
+                                                />
                                             </div>
                                         </div>
 

@@ -99,11 +99,11 @@ export default function AutocompleteInput({
 
     return (
         <div className="relative w-full">
-            {label && (
+            {/* {label && (
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                     {label}
                 </label>
-            )}
+            )} */}
 
             <input
                 ref={inputRef}
@@ -115,14 +115,14 @@ export default function AutocompleteInput({
                     if (filteredOptions.length > 0) setIsOpen(true);
                 }}
                 placeholder={placeholder}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#42e0ff] focus:border-white outline-none transition"
                 autoComplete="off"
             />
 
             {isOpen && filteredOptions.length > 0 && (
                 <div
                     ref={dropdownRef}
-                    className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto"
+                    className="absolute z-10 w-full mt-1 text-[#313749] bg-gray-200 border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto"
                 >
                     {filteredOptions.map((option, index) => (
                         <div
@@ -130,8 +130,8 @@ export default function AutocompleteInput({
                             onClick={() => handleSelect(option)}
                             onMouseEnter={() => setHighlightedIndex(index)}
                             className={`px-4 py-2 cursor-pointer transition ${index === highlightedIndex
-                                    ? 'bg-blue-500 text-white'
-                                    : 'hover:bg-gray-100'
+                                ? 'bg-[#42e0ff] text-[#313749]'
+                                : 'hover:bg-gray-100'
                                 }`}
                         >
                             {option}
