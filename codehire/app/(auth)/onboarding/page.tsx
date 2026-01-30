@@ -1,18 +1,40 @@
 'use client';
 import React, { useState } from 'react';
+import AutocompleteInput from '../../components/AutocompleteInput';
+
 
 
 // Types for form data
 interface OnboardingFormData {
     name: string;
-    email: string;
+    major: string;
+    graduationYear: number;
+    graduationMonth: string;
     jobTitle: string;
     experienceLevel: string;
     jobPreferences: {
-        remoteWork: boolean;
         fullTime: boolean;
         partTime: boolean;
         contract: boolean;
+        internship: boolean;
+        coOp: boolean;
+
+    };
+    workLocations: {
+        remote: boolean;
+        hybrid: boolean;
+        inPerson: boolean;
+    };
+    companyStages: {
+        startup: boolean;
+        earlyStage: boolean;
+        publicTech: boolean;
+        faang: boolean;
+    };
+    pay: number;
+    payPeriod: {
+        hourly: boolean;
+        yearly: boolean;
     };
     skills: string[];
     location: string;
@@ -22,14 +44,33 @@ interface OnboardingFormData {
 // Initial form state
 const initialFormData: OnboardingFormData = {
     name: '',
-    email: '',
     jobTitle: '',
+    graduationMonth: '',
+    graduationYear: 0,
     experienceLevel: '',
+    major: '',
     jobPreferences: {
-        remoteWork: false,
         fullTime: false,
         partTime: false,
         contract: false,
+        internship: false,
+        coOp: false,
+    },
+    workLocations: {
+        remote: false,
+        hybrid: false,
+        inPerson: false,
+    },
+    companyStages: {
+        startup: false,
+        earlyStage: false,
+        publicTech: false,
+        faang: false,
+    },
+    pay: 0,
+    payPeriod: {
+        hourly: false,
+        yearly: false,
     },
     skills: [],
     location: '',
@@ -40,6 +81,61 @@ export default function OnboardingPage() {
     const [formData, setFormData] = useState<OnboardingFormData>(initialFormData);
     const [currentStep, setCurrentStep] = useState(1);
     const [skillInput, setSkillInput] = useState('');
+
+    const [selectedFruit, setSelectedFruit] = useState('');
+    const [selectedCountry, setSelectedCountry] = useState('');
+    const [selectedMajor, setSelectedMajor] = useState('');
+
+    const majors = [
+        'Artificial Intelligence (AI) & Machine Learning',
+        'Computer Engineering',
+        'Computer Information Systems (CIS)',
+        'Computer Science (CS)',
+        'Cybersecurity/Information Security',
+        'Data Science/Analytics',
+        'Digital Forensics',
+        'Game Development',
+        'Health Information Technology',
+        'Human-Computer Interaction (HCI)',
+        'Information Technology (IT)',
+        'Instructional Technology',
+        'Management Information Systems (MIS)',
+        'Network Engineering/Cloud Computing',
+        'Robotics Technology/Mechatronics',
+        'Software Engineering/Development',
+        'Web Development/Frontend/Backend']
+
+    const fruits = [
+        'Apple',
+        'Apricot',
+        'Banana',
+        'Blueberry',
+        'Cherry',
+        'Grape',
+        'Mango',
+        'Orange',
+        'Peach',
+        'Pear',
+        'Pineapple',
+        'Strawberry',
+        'Watermelon',
+    ];
+
+    const countries = [
+        'United States',
+        'United Kingdom',
+        'Canada',
+        'Australia',
+        'Germany',
+        'France',
+        'Italy',
+        'Spain',
+        'Japan',
+        'China',
+        'India',
+        'Brazil',
+        'Mexico',
+    ];
 
     // Update text input fields
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -70,6 +166,31 @@ export default function OnboardingPage() {
             },
         }));
     };
+
+    // Update work locations preferences checkboxes
+    const handleWorkLocationsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, checked } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            workLocations: {
+                ...prev.workLocations,
+                [name]: checked,
+            },
+        }));
+    };
+
+    // Update job preferences checkboxes
+    const handleCompanyStagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, checked } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            companyStages: {
+                ...prev.companyStages,
+                [name]: checked,
+            },
+        }));
+    };
+
 
     // Add skill to array
     const handleAddSkill = () => {
@@ -102,9 +223,10 @@ export default function OnboardingPage() {
     // Form submission
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        console.log('Form submitted:', formData);
+        console.log('Form submitted:', formData, { selectedFruit, selectedCountry });
         // Add your submission logic here (API call, etc.)
         alert('Onboarding form submitted successfully!');
+        alert(`Fruit: ${selectedFruit}\nCountry: ${selectedCountry}`);
     };
 
     // Navigation
@@ -154,7 +276,7 @@ export default function OnboardingPage() {
                                 {currentStep === 1 && (
                                     <div className="space-y-6">
                                         <h2 className="text-xl font-semibold text-white mb-4">
-                                            BASIC INFORMATION
+                                            BASIC INFO
                                         </h2>
 
                                         <div>
@@ -173,7 +295,7 @@ export default function OnboardingPage() {
                                             />
                                         </div>
 
-                                        <div>
+                                        {/* <div>
                                             <label htmlFor="email" className="block text-sm font-medium text-white2">
                                                 Email Address *
                                             </label>
@@ -187,22 +309,116 @@ export default function OnboardingPage() {
                                                 className="w-full px-4 py-2 border border-white rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                                 placeholder="john@example.com"
                                             />
-                                        </div>
+                                        </div> */}
 
                                         <div>
-                                            <label htmlFor="location" className="block text-sm font-medium text-white mb-2">
-                                                Location *
+                                            <label htmlFor="major" className="block text-sm font-medium text-white mb-2">
+                                                Major *
                                             </label>
                                             <input
                                                 type="text"
-                                                id="location"
-                                                name="location"
-                                                value={formData.location}
+                                                id="major"
+                                                name="major"
+                                                value={formData.major}
                                                 onChange={handleInputChange}
                                                 required
-                                                className="w-full px-4 py-2 border border-white rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                                placeholder="San Francisco, CA"
+                                                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                placeholder=""
                                             />
+                                        </div>
+
+
+                                        <form onSubmit={handleSubmit} className="block text-sm font-medium text-white mb-2">
+                                            <AutocompleteInput
+                                                label="Major"
+                                                options={majors}
+                                                value={selectedMajor}
+                                                onChange={setSelectedMajor}
+                                                placeholder="e.g., Computer Science, Software Engineering..."
+                                                maxSuggestions={5}
+                                            />
+
+                                            <AutocompleteInput
+                                                label="Country"
+                                                options={countries}
+                                                value={selectedCountry}
+                                                onChange={setSelectedCountry}
+                                                placeholder="e.g., United States, Canada, or your own..."
+                                                maxSuggestions={5}
+                                            />
+
+                                            <button
+                                                type="submit"
+                                                className="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 px-4 rounded-lg transition"
+                                            >
+                                                Submit
+                                            </button>
+                                        </form>
+
+                                        {/* {(selectedFruit || selectedCountry) && (
+                                                    <div className="mt-8 p-4 bg-gray-100 rounded-lg">
+                                                        <h3 className="font-semibold text-gray-700 mb-2">Current Values:</h3>
+                                                        <p className="text-gray-600">
+                                                            <strong>Fruit:</strong> {selectedFruit || '(not selected)'}
+                                                        </p>
+                                                        <p className="text-gray-600">
+                                                            <strong>Country:</strong> {selectedCountry || '(not selected)'}
+                                                        </p>
+                                                    </div>
+                                                )} */}
+
+
+                                        <div>
+                                            <label className="block text-sm font-medium text-white mb-2">
+                                                Expected Graduation Date *
+                                            </label>
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div>
+                                                    <select
+                                                        id="graduationMonth"
+                                                        name="graduationMonth"
+                                                        value={formData.graduationMonth}
+                                                        onChange={handleSelectChange}
+                                                        required
+                                                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                    >
+                                                        <option value="">Month</option>
+                                                        <option value="01">January</option>
+                                                        <option value="02">February</option>
+                                                        <option value="03">March</option>
+                                                        <option value="04">April</option>
+                                                        <option value="05">May</option>
+                                                        <option value="06">June</option>
+                                                        <option value="07">July</option>
+                                                        <option value="08">August</option>
+                                                        <option value="09">September</option>
+                                                        <option value="10">October</option>
+                                                        <option value="11">November</option>
+                                                        <option value="12">December</option>
+                                                    </select>
+                                                </div>
+                                                <div>
+                                                    <select
+                                                        id="graduationYear"
+                                                        name="graduationYear"
+                                                        value={formData.graduationYear || ''}
+                                                        onChange={handleSelectChange}
+                                                        required
+                                                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                    >
+                                                        <option value="">Year</option>
+
+                                                        {Array.from({ length: 20 }, (_, i) => {
+                                                            const year = (new Date().getFullYear() - 10) + i;
+                                                            return (
+                                                                <option key={year} value={year}>
+                                                                    {year}
+                                                                </option>
+                                                            );
+                                                        })}
+                                                    </select>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 )}
@@ -231,7 +447,7 @@ export default function OnboardingPage() {
                                         </div>
 
                                         <div>
-                                            <label htmlFor="experienceLevel" className="block text-sm font-medium text-white mb-2">
+                                            <label htmlFor="experienceLevel" className="block text-sm font-bold text-white mb-2">
                                                 Experience Level *
                                             </label>
                                             <select
@@ -288,15 +504,130 @@ export default function OnboardingPage() {
                                                 <label className="flex items-center">
                                                     <input
                                                         type="checkbox"
-                                                        name="remoteWork"
-                                                        checked={formData.jobPreferences.remoteWork}
+                                                        name="internship"
+                                                        checked={formData.jobPreferences.internship}
                                                         onChange={handleJobPreferenceChange}
                                                         className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-white rounded"
                                                     />
-                                                    <span className="ml-2 text-white">Remote Work</span>
+                                                    <span className="ml-2 text-white">Internship</span>
+                                                </label>
+                                                <label className="flex items-center">
+                                                    <input
+                                                        type="checkbox"
+                                                        name="coOp"
+                                                        checked={formData.jobPreferences.coOp}
+                                                        onChange={handleJobPreferenceChange}
+                                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-white rounded"
+                                                    />
+                                                    <span className="ml-2 text-white">Co-op</span>
                                                 </label>
                                             </div>
                                         </div>
+
+                                        <div>
+                                            <label className="block text-sm font-medium text-white mb-2">
+                                                Work Location Preferneces *
+                                            </label>
+                                            <div className="space-y-2">
+                                                <label className="flex items-center">
+                                                    <input
+                                                        type="checkbox"
+                                                        name="remote"
+                                                        checked={formData.workLocations.remote}
+                                                        onChange={handleWorkLocationsChange}
+                                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-white rounded"
+                                                    />
+                                                    <span className="ml-2 text-white">Remote</span>
+                                                </label>
+                                                <label className="flex items-center">
+                                                    <input
+                                                        type="checkbox"
+                                                        name="hybrid"
+                                                        checked={formData.workLocations.hybrid}
+                                                        onChange={handleWorkLocationsChange}
+                                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-white rounded"
+                                                    />
+                                                    <span className="ml-2 text-white">Hybrid</span>
+                                                </label>
+                                                <label className="flex items-center">
+                                                    <input
+                                                        type="checkbox"
+                                                        name="inPerson"
+                                                        checked={formData.workLocations.inPerson}
+                                                        onChange={handleWorkLocationsChange}
+                                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-white rounded"
+                                                    />
+                                                    <span className="ml-2 text-white">In Person</span>
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-medium text-white mb-2">
+                                                What company stages are you intersted in? *
+                                            </label>
+                                            <div className="space-y-2">
+                                                <label className="flex items-center">
+                                                    <input
+                                                        type="checkbox"
+                                                        name="startup"
+                                                        checked={formData.companyStages.startup}
+                                                        onChange={handleCompanyStagesChange}
+                                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-white rounded"
+                                                    />
+                                                    <span className="ml-2 text-white">Startup</span>
+                                                </label>
+                                                <label className="flex items-center">
+                                                    <input
+                                                        type="checkbox"
+                                                        name="earlyStage"
+                                                        checked={formData.companyStages.earlyStage}
+                                                        onChange={handleCompanyStagesChange}
+                                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-white rounded"
+                                                    />
+                                                    <span className="ml-2 text-white">Early Sage</span>
+                                                </label>
+                                                <label className="flex items-center">
+                                                    <input
+                                                        type="checkbox"
+                                                        name="publicTech"
+                                                        checked={formData.companyStages.publicTech}
+                                                        onChange={handleCompanyStagesChange}
+                                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-white rounded"
+                                                    />
+                                                    <span className="ml-2 text-white">Public Tech</span>
+                                                </label>
+                                                <label className="flex items-center">
+                                                    <input
+                                                        type="checkbox"
+                                                        name="inPerson"
+                                                        checked={formData.companyStages.faang}
+                                                        onChange={handleCompanyStagesChange}
+                                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-white rounded"
+                                                    />
+                                                    <span className="ml-2 text-white">In Person</span>
+                                                </label>
+
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <label htmlFor="location" className="block text-sm font-medium text-white mb-2">
+                                                Location *
+                                            </label>
+                                            <input
+                                                type="text"
+                                                id="location"
+                                                name="location"
+                                                value={formData.location}
+                                                onChange={handleInputChange}
+                                                required
+                                                className="w-full px-4 py-2 border border-white rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                placeholder="San Francisco, CA"
+                                            />
+                                        </div>
+
+                                        {/* TODO: add pay and pay period here */}
                                     </div>
                                 )}
 
@@ -403,7 +734,7 @@ export default function OnboardingPage() {
                         </div>
                     </div>
                 </div>
-            </div>
+            </div >
         </div >
     )
 }
