@@ -33,6 +33,21 @@ interface OnboardingFormData {
         publicTech: boolean;
         faang: boolean;
     };
+    industries: {
+        aerospace: boolean;
+        artsEntertainment: boolean;
+        defense: boolean;
+        education: boolean;
+        energy: boolean;
+        financeInsurance: boolean;
+        governmentPublicAdministration: boolean;
+        healthcare: boolean;
+        informationTechnology: boolean;
+        manufacturing: boolean;
+        mediaCommunication: boolean;
+        professionalBusinessServices: boolean;
+        retail: boolean;
+    }
     pay: number;
     payPeriod: {
         hourly: boolean;
@@ -69,6 +84,21 @@ const initialFormData: OnboardingFormData = {
         publicTech: false,
         faang: false,
     },
+    industries: {
+        aerospace: false,
+        artsEntertainment: false,
+        defense: false,
+        education: false,
+        energy: false,
+        financeInsurance: false,
+        governmentPublicAdministration: false,
+        healthcare: false,
+        informationTechnology: false,
+        manufacturing: false,
+        mediaCommunication: false,
+        professionalBusinessServices: false,
+        retail: false,
+    },
     pay: 0,
     payPeriod: {
         hourly: false,
@@ -90,7 +120,7 @@ export default function OnboardingPage() {
     const [selectedJobs, setSelectedJobs] = useState<string[]>([]);
     const [selectedCodingLanguages, setSelectedCodingLanguages] = useState<string[]>([]);
     const [selectedIndustries, setSelectedIndustries] = useState<string[]>([]);
-
+    const [payType, setPayType] = useState<'hourly' | 'yearly'>('hourly');
 
     const majors = [
         'Artificial Intelligence (AI) & Machine Learning',
@@ -168,25 +198,25 @@ export default function OnboardingPage() {
         'Mexico',
     ];
 
-    const INDUSTRIES = [
-        'Aerospace',
-        'Arts & Entertainment',
-        'Construction',
-        'Defense',
-        'Education',
-        'Energy',
-        'Finance & Insurance',
-        'Government/Public Administration',
-        'Healthcare',
-        'Hospitality & Tourism',
-        'Information Technology',
-        'Manufacturing',
-        'Media & Communication',
-        'Professional & Business Services',
-        'Real Estate',
-        'Retail',
-        'Transportation & Logistics',
-    ]
+    // const INDUSTRIES = [
+    //     'Aerospace',
+    //     'Arts & Entertainment',
+    //     'Construction',
+    //     'Defense',
+    //     'Education',
+    //     'Energy',
+    //     'Finance & Insurance',
+    //     'Government/Public Administration',
+    //     'Healthcare',
+    //     'Hospitality & Tourism',
+    //     'Information Technology',
+    //     'Manufacturing',
+    //     'Media & Communication',
+    //     'Professional & Business Services',
+    //     'Real Estate',
+    //     'Retail',
+    //     'Transportation & Logistics',
+    // ]
 
     // Update text input fields
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -237,6 +267,18 @@ export default function OnboardingPage() {
             ...prev,
             companyStages: {
                 ...prev.companyStages,
+                [name]: checked,
+            },
+        }));
+    };
+
+    // Update job industry checkboxes
+    const handleIndustriesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, checked } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            industries: {
+                ...prev.industries,
                 [name]: checked,
             },
         }));
@@ -606,6 +648,20 @@ export default function OnboardingPage() {
                                         </div>
 
                                         <div>
+                                            <label htmlFor="name" className="block text-sm font-medium text-white mb-2 ">
+                                                Country
+                                            </label>
+                                            <AutocompleteInput
+                                                label="Country"
+                                                options={countries}
+                                                value={selectedCountry}
+                                                onChange={setSelectedCountry}
+                                                placeholder="e.g., United States, Canada, or your own..."
+                                                maxSuggestions={5}
+                                            />
+                                        </div>
+
+                                        <div>
                                             <label className="block text-sm font-medium text-white mb-2">
                                                 What company stages are you intersted in? *
                                             </label>
@@ -628,7 +684,7 @@ export default function OnboardingPage() {
                                                         onChange={handleCompanyStagesChange}
                                                         className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-white rounded"
                                                     />
-                                                    <span className="ml-2 text-white">Early Sage</span>
+                                                    <span className="ml-2 text-white">Early Stage</span>
                                                 </label>
                                                 <label className="flex items-center">
                                                     <input
@@ -645,26 +701,11 @@ export default function OnboardingPage() {
                                         </div>
 
 
-                                        <div>
-                                            <label htmlFor="name" className="block text-sm font-medium text-white mb-2 ">
-                                                Country
-                                            </label>
-                                            <AutocompleteInput
-                                                label="Country"
-                                                options={countries}
-                                                value={selectedCountry}
-                                                onChange={setSelectedCountry}
-                                                placeholder="e.g., United States, Canada, or your own..."
-                                                maxSuggestions={5}
-                                            />
-                                        </div>
-
-
+                                        {/* 
                                         <div>
                                             <label htmlFor="industries" className="block text-sm font-bold text-white mb-2">
                                                 Industries
                                             </label>
-                                            {/* Industries Section */}
                                             <div className="pb-6 border-b border-gray-200">
                                                 <BadgeSelector
                                                     options={INDUSTRIES}
@@ -677,13 +718,194 @@ export default function OnboardingPage() {
                                                     allowCustom={true}
                                                 />
                                             </div>
+                                        </div> */}
+
+                                        <div>
+                                            <label className="block text-sm font-medium text-white mb-2">
+                                                What industries you intersted in? *
+                                            </label>
+                                            <div className="space-y-2">
+                                                <label className="flex items-center">
+                                                    <input
+                                                        type="checkbox"
+                                                        name="aerospace"
+                                                        checked={formData.industries.aerospace}
+                                                        onChange={handleIndustriesChange}
+                                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-white rounded"
+                                                    />
+                                                    <span className="ml-2 text-white">Aerospace</span>
+                                                </label>
+                                                <label className="flex items-center">
+                                                    <input
+                                                        type="checkbox"
+                                                        name="artsEntertainment"
+                                                        checked={formData.industries.artsEntertainment}
+                                                        onChange={handleIndustriesChange}
+                                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-white rounded"
+                                                    />
+                                                    <span className="ml-2 text-white">Arts & Entertaiment</span>
+                                                </label>
+                                                <label className="flex items-center">
+                                                    <input
+                                                        type="checkbox"
+                                                        name="defense"
+                                                        checked={formData.industries.defense}
+                                                        onChange={handleIndustriesChange}
+                                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-white rounded"
+                                                    />
+                                                    <span className="ml-2 text-white">Defense</span>
+                                                </label>
+                                                <label className="flex items-center">
+                                                    <input
+                                                        type="checkbox"
+                                                        name="education"
+                                                        checked={formData.industries.education}
+                                                        onChange={handleIndustriesChange}
+                                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-white rounded"
+                                                    />
+                                                    <span className="ml-2 text-white">Education</span>
+                                                </label>
+                                                <label className="flex items-center">
+                                                    <input
+                                                        type="checkbox"
+                                                        name="energy"
+                                                        checked={formData.industries.energy}
+                                                        onChange={handleIndustriesChange}
+                                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-white rounded"
+                                                    />
+                                                    <span className="ml-2 text-white">Energy</span>
+                                                </label>
+                                                <label className="flex items-center">
+                                                    <input
+                                                        type="checkbox"
+                                                        name="financeInsurance"
+                                                        checked={formData.industries.financeInsurance}
+                                                        onChange={handleIndustriesChange}
+                                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-white rounded"
+                                                    />
+                                                    <span className="ml-2 text-white">Finance/Insurance</span>
+                                                </label>
+                                                <label className="flex items-center">
+                                                    <input
+                                                        type="checkbox"
+                                                        name="governmentPublicAdministration"
+                                                        checked={formData.industries.governmentPublicAdministration}
+                                                        onChange={handleIndustriesChange}
+                                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-white rounded"
+                                                    />
+                                                    <span className="ml-2 text-white">Government & Public Administration</span>
+                                                </label>
+                                                <label className="flex items-center">
+                                                    <input
+                                                        type="checkbox"
+                                                        name="healthcare"
+                                                        checked={formData.industries.healthcare}
+                                                        onChange={handleIndustriesChange}
+                                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-white rounded"
+                                                    />
+                                                    <span className="ml-2 text-white">Healthcare</span>
+                                                </label>
+                                                <label className="flex items-center">
+                                                    <input
+                                                        type="checkbox"
+                                                        name="informationTechnology"
+                                                        checked={formData.industries.informationTechnology}
+                                                        onChange={handleIndustriesChange}
+                                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-white rounded"
+                                                    />
+                                                    <span className="ml-2 text-white">Information Technology</span>
+                                                </label>
+                                                <label className="flex items-center">
+                                                    <input
+                                                        type="checkbox"
+                                                        name="manufacturing"
+                                                        checked={formData.industries.manufacturing}
+                                                        onChange={handleIndustriesChange}
+                                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-white rounded"
+                                                    />
+                                                    <span className="ml-2 text-white">Manufacturing</span>
+                                                </label>
+                                                <label className="flex items-center">
+                                                    <input
+                                                        type="checkbox"
+                                                        name="mediaCommunication"
+                                                        checked={formData.industries.mediaCommunication}
+                                                        onChange={handleIndustriesChange}
+                                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-white rounded"
+                                                    />
+                                                    <span className="ml-2 text-white">Media & Communication</span>
+                                                </label>
+                                                <label className="flex items-center">
+                                                    <input
+                                                        type="checkbox"
+                                                        name="professionalBusinessServices"
+                                                        checked={formData.industries.professionalBusinessServices}
+                                                        onChange={handleIndustriesChange}
+                                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-white rounded"
+                                                    />
+                                                    <span className="ml-2 text-white">Professional & Buisness Services</span>
+                                                </label>
+
+                                                <label className="flex items-center">
+                                                    <input
+                                                        type="checkbox"
+                                                        name="retail"
+                                                        checked={formData.industries.retail}
+                                                        onChange={handleIndustriesChange}
+                                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-white rounded"
+                                                    />
+                                                    <span className="ml-2 text-white">Retail</span>
+                                                </label>
+
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-medium text-white mb-2">
+                                                What is the minimum pay you are looking for *
+                                            </label>
+                                            <input
+                                                // type="number"
+                                                id="pay"
+                                                name="pay"
+                                                value={formData.pay}
+                                                onChange={handleInputChange}
+                                                required
+                                                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                placeholder="$"
+                                            />
+                                            {/* TODO: add pay and pay period here */}
+
+                                            <div className="flex gap-3 mt-2 w-2">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setPayType('hourly')}
+                                                    className={`flex-1 px-2 py-1 rounded-full text-sm font-medium transition-all ${payType === 'hourly'
+                                                        ? 'bg-blue-100 text-blue-800 border-2 border-blue-400'
+                                                        : 'bg-gray-100 text-gray-600 border-2 border-gray-300 hover:bg-gray-200'
+                                                        }`}
+                                                >
+                                                    Hourly
+                                                </button>
+
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setPayType('yearly')}
+                                                    className={`flex-1 px-2 py-1 rounded-full text-sm font-medium transition-all ${payType === 'yearly'
+                                                        ? 'bg-blue-100 text-blue-800 border-2 border-blue-400'
+                                                        : 'bg-gray-100 text-gray-600 border-2 border-gray-300 hover:bg-gray-200'
+                                                        }`}
+                                                >
+                                                    Yearly
+                                                </button>
+
+                                                {/* <div className="p-4 bg-gray-50 rounded-lg text-gray-600">
+                                                Selected: <strong className="text-gray-900 capitalize">{payType}</strong>
+                                            </div> */}
+                                            </div>
                                         </div>
 
 
-
-
-
-                                        {/* TODO: add pay and pay period here */}
                                     </div>
                                 )}
 
@@ -755,7 +977,7 @@ export default function OnboardingPage() {
                                         </div>
 
                                         <div>
-                                            <label htmlFor="resume" className="block text-sm font-medium text-gray-700 mb-2">
+                                            <label htmlFor="resume" className="block text-sm font-medium text-white mb-2">
                                                 Upload Resume (Optional)
                                             </label>
                                             <input
