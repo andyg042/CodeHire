@@ -4,18 +4,28 @@ interface AutocompleteInputProps {
     options: string[];
     value: string;
     onChange: (value: string) => void;
+    onSelect: (value: string) => void;
     placeholder?: string;
     label?: string;
     maxSuggestions?: number;
+    allowCustom?: boolean; // New prop to allow custom input
+    clearOnSelect?: boolean; // Whether to clear input after selection
+
+
 }
 
 export default function AutocompleteInput({
     options,
     value,
     onChange,
+    onSelect,
     placeholder = 'Start typing...',
     label,
     maxSuggestions = 5,
+    allowCustom = true, // Default to true
+    clearOnSelect = false, // Default to NOT clearing (show selected value)
+
+
 }: AutocompleteInputProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [filteredOptions, setFilteredOptions] = useState<string[]>([]);
@@ -54,45 +64,109 @@ export default function AutocompleteInput({
                 setIsOpen(false);
             }
         }
-
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        onChange(e.target.value);
-    };
+    // const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    //     onChange(e.target.value);
+    //     setIsOpen(true);
+
+    // };
+
 
     const handleSelect = (option: string) => {
-        onChange(option);
+        onSelect(option);
+        if (clearOnSelect) {
+            onChange(''); // Clear the input
+        } else {
+            onChange(option); // Set the input to the selected value
+        }
         setIsOpen(false);
-        inputRef.current?.blur();
+        setHighlightedIndex(-1);
     };
 
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (!isOpen) return;
+    // const handleSelect = (option: string) => {
+    //     isSelectingRef.current = true;
+    //     onSelect(option);          // ✅ tell parent a job was chosen
+    //     onChange(option);
+    //     setIsOpen(false);
+    //     setFilteredOptions([]); // ← This prevents reopening on refocus
+    //     inputRef.current?.blur();
+    // };
 
+    // const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    //     if (!isOpen) return;
+
+    //     switch (e.key) {
+    //         case 'ArrowDown':
+    //             e.preventDefault();
+    //             setHighlightedIndex((prev) =>
+    //                 prev < filteredOptions.length - 1 ? prev + 1 : prev
+    //             );
+    //             break;
+    //         case 'ArrowUp':
+    //             e.preventDefault();
+    //             setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : -1));
+    //             break;
+    //         case 'Enter':
+    //             // e.preventDefault();
+    //             // if (highlightedIndex >= 0) {
+    //             //     handleSelect(filteredOptions[highlightedIndex]);
+    //             // } else {
+    //             //     setIsOpen(false);
+    //             // }
+    //             // break;
+    //             e.preventDefault();
+    //             if (isOpen && highlightedIndex >= 0) {
+    //                 // Select highlighted option from dropdown
+    //                 handleSelect(filteredOptions[highlightedIndex]);
+    //             } else if (value.trim() && allowCustom) {
+    //                 // Accept custom input
+    //                 handleSelect(value.trim());
+    //             } else if (!allowCustom && filteredOptions.length > 0) {
+    //                 // If custom not allowed, select first filtered option
+    //                 handleSelect(filteredOptions[0]);
+    //             }
+    //             break;
+    //         case 'Escape':
+    //             setIsOpen(false);
+    //             break;
+    //     }
+    // };
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         switch (e.key) {
             case 'ArrowDown':
-                e.preventDefault();
-                setHighlightedIndex((prev) =>
-                    prev < filteredOptions.length - 1 ? prev + 1 : prev
-                );
+                if (isOpen && filteredOptions.length > 0) {
+                    e.preventDefault();
+                    setHighlightedIndex((prev) =>
+                        prev < filteredOptions.length - 1 ? prev + 1 : prev
+                    );
+                }
                 break;
             case 'ArrowUp':
-                e.preventDefault();
-                setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : -1));
+                if (isOpen && filteredOptions.length > 0) {
+                    e.preventDefault();
+                    setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : -1));
+                }
                 break;
             case 'Enter':
                 e.preventDefault();
-                if (highlightedIndex >= 0) {
+                if (isOpen && highlightedIndex >= 0) {
+                    // Select highlighted option from dropdown
                     handleSelect(filteredOptions[highlightedIndex]);
-                } else {
-                    setIsOpen(false);
+                } else if (value.trim() && allowCustom) {
+                    // Accept custom input
+                    handleSelect(value.trim());
+                } else if (!allowCustom && filteredOptions.length > 0) {
+                    // If custom not allowed, select first filtered option
+                    handleSelect(filteredOptions[0]);
                 }
                 break;
             case 'Escape':
                 setIsOpen(false);
+                setHighlightedIndex(-1);
                 break;
         }
     };
@@ -109,10 +183,13 @@ export default function AutocompleteInput({
                 ref={inputRef}
                 type="text"
                 value={value}
-                onChange={handleInputChange}
+                // onChange={handleInputChange}
+                onChange={e => onChange(e.target.value)}
                 onKeyDown={handleKeyDown}
                 onFocus={() => {
-                    if (filteredOptions.length > 0) setIsOpen(true);
+                    if (value.trim() && filteredOptions.length > 0) {
+                        setIsOpen(true);
+                    }
                 }}
                 placeholder={placeholder}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#42e0ff] focus:border-white outline-none transition"
@@ -127,7 +204,8 @@ export default function AutocompleteInput({
                     {filteredOptions.map((option, index) => (
                         <div
                             key={option}
-                            onClick={() => handleSelect(option)}
+                            // onClick={() => handleSelect(option)}
+                            onMouseDown={() => handleSelect(option)}
                             onMouseEnter={() => setHighlightedIndex(index)}
                             className={`px-4 py-2 cursor-pointer transition ${index === highlightedIndex
                                 ? 'bg-[#42e0ff] text-[#313749]'

@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import AutocompleteInput from '../../components/AutocompleteInput';
 import BadgeSelector from '../../components/BadgeSelector';
+import { PayPeriod } from '@prisma/client';
 
 
 
@@ -12,7 +13,7 @@ interface OnboardingFormData {
     major: string;
     graduationYear: number;
     graduationMonth: string;
-    jobTitles: [];
+    jobTitles: string[];
     experienceLevel: string;
     jobPreferences: {
         fullTime: boolean;
@@ -54,6 +55,7 @@ interface OnboardingFormData {
         yearly: boolean;
     };
     skills: string[];
+    codingLanguages: string[];
     location: string;
     resume?: File | null;
 }
@@ -105,6 +107,7 @@ const initialFormData: OnboardingFormData = {
         yearly: false,
     },
     skills: [],
+    codingLanguages: [],
     location: '',
     resume: null,
 };
@@ -236,6 +239,9 @@ export default function OnboardingPage() {
         }));
     };
 
+
+
+
     // Update job preferences checkboxes
     const handleJobPreferenceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, checked } = e.target;
@@ -316,7 +322,20 @@ export default function OnboardingPage() {
     // Form submission
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        console.log('Form submitted:', formData, { selectedMajor, selectedCountry, selectedIndustries, selectedCodingLanguages });
+        // Merge separate state into formData right before using it
+        const completeFormData = {
+            ...formData,
+            major: selectedMajor,
+            location: selectedCountry,
+            jobTitles: selectedJobs,
+            codingLanguages: selectedCodingLanguages,
+            payPeriod: payType
+        };
+        console.log('Form submitted:', completeFormData);
+
+
+
+        // console.log('Form submitted:', formData, { selectedMajor, selectedCountry, selectedIndustries, selectedCodingLanguages });
         // Add your submission logic here (API call, etc.)
         if (currentStep < 3) {
             return; // Don't submit if not on final step
@@ -397,38 +416,6 @@ export default function OnboardingPage() {
                                             />
                                         </div>
 
-                                        {/* <div>
-                                            <label htmlFor="email" className="block text-sm font-medium text-white2">
-                                                Email Address *
-                                            </label>
-                                            <input
-                                                type="email"
-                                                id="email"
-                                                name="email"
-                                                value={formData.email}
-                                                onChange={handleInputChange}
-                                                required
-                                                className="w-full px-4 py-2 border border-white rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                                placeholder="john@example.com"
-                                            />
-                                        </div> */}
-
-                                        {/* <div>
-                                            <label htmlFor="major" className="block text-sm font-medium text-white mb-2">
-                                                Major *
-                                            </label>
-                                            <input
-                                                type="text"
-                                                id="major"
-                                                name="major"
-                                                value={formData.major}
-                                                onChange={handleInputChange}
-                                                required
-                                                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                                placeholder=""
-                                            />
-                                        </div> */}
-
 
                                         <label htmlFor="name" className="block text-sm font-medium text-white mb-2">
                                             Major
@@ -436,8 +423,9 @@ export default function OnboardingPage() {
                                         <AutocompleteInput
                                             label="Major"
                                             options={majors}
-                                            value={selectedMajor}
-                                            onChange={setSelectedMajor}
+                                            value={formData.major}
+                                            onChange={(value) => setFormData(prev => ({ ...prev, major: value }))}
+                                            onSelect={(value) => setFormData(prev => ({ ...prev, major: value }))}
                                             placeholder="e.g., Computer Science, Software Engineering..."
                                             maxSuggestions={5}
                                         />
@@ -530,6 +518,7 @@ export default function OnboardingPage() {
                                                     options={JOB_TITLES}
                                                     selectedItems={selectedJobs}
                                                     onSelectionChange={setSelectedJobs}
+                                                    // onSelectionChange={(items) => setFormData(prev => ({ ...prev, jobTitles: items }))}
                                                     placeholder="Search job titles..."
                                                     // label="Job Titles"
                                                     description="What types of roles are you interested in?"
@@ -665,6 +654,7 @@ export default function OnboardingPage() {
                                                 options={countries}
                                                 value={selectedCountry}
                                                 onChange={setSelectedCountry}
+                                                onSelect={setSelectedCountry}
                                                 placeholder="e.g., United States, Canada, or your own..."
                                                 maxSuggestions={5}
                                             />
