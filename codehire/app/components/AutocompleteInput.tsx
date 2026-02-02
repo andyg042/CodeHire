@@ -48,7 +48,7 @@ export default function AutocompleteInput({
             .slice(0, maxSuggestions);
 
         setFilteredOptions(filtered);
-        setIsOpen(filtered.length > 0);
+        // setIsOpen(filtered.length > 0);
         setHighlightedIndex(-1);
     }, [value, options, maxSuggestions]);
 
@@ -86,54 +86,6 @@ export default function AutocompleteInput({
         setHighlightedIndex(-1);
     };
 
-    // const handleSelect = (option: string) => {
-    //     isSelectingRef.current = true;
-    //     onSelect(option);          // ✅ tell parent a job was chosen
-    //     onChange(option);
-    //     setIsOpen(false);
-    //     setFilteredOptions([]); // ← This prevents reopening on refocus
-    //     inputRef.current?.blur();
-    // };
-
-    // const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    //     if (!isOpen) return;
-
-    //     switch (e.key) {
-    //         case 'ArrowDown':
-    //             e.preventDefault();
-    //             setHighlightedIndex((prev) =>
-    //                 prev < filteredOptions.length - 1 ? prev + 1 : prev
-    //             );
-    //             break;
-    //         case 'ArrowUp':
-    //             e.preventDefault();
-    //             setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : -1));
-    //             break;
-    //         case 'Enter':
-    //             // e.preventDefault();
-    //             // if (highlightedIndex >= 0) {
-    //             //     handleSelect(filteredOptions[highlightedIndex]);
-    //             // } else {
-    //             //     setIsOpen(false);
-    //             // }
-    //             // break;
-    //             e.preventDefault();
-    //             if (isOpen && highlightedIndex >= 0) {
-    //                 // Select highlighted option from dropdown
-    //                 handleSelect(filteredOptions[highlightedIndex]);
-    //             } else if (value.trim() && allowCustom) {
-    //                 // Accept custom input
-    //                 handleSelect(value.trim());
-    //             } else if (!allowCustom && filteredOptions.length > 0) {
-    //                 // If custom not allowed, select first filtered option
-    //                 handleSelect(filteredOptions[0]);
-    //             }
-    //             break;
-    //         case 'Escape':
-    //             setIsOpen(false);
-    //             break;
-    //     }
-    // };
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         switch (e.key) {
@@ -184,8 +136,11 @@ export default function AutocompleteInput({
                 type="text"
                 value={value}
                 // onChange={handleInputChange}
-                onChange={e => onChange(e.target.value)}
                 onKeyDown={handleKeyDown}
+                onChange={e => {
+                    onChange(e.target.value);  // update value
+                    setIsOpen(true);           // open dropdown
+                }}
                 onFocus={() => {
                     if (value.trim() && filteredOptions.length > 0) {
                         setIsOpen(true);

@@ -290,7 +290,6 @@ export default function OnboardingPage() {
         }));
     };
 
-
     // Add skill to array
     const handleAddSkill = () => {
         if (skillInput.trim() && !formData.skills.includes(skillInput.trim())) {
