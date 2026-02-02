@@ -12,6 +12,7 @@ interface BadgeSelectorProps {
     maxSuggestions?: number;
     allowCustom?: boolean;
 }
+// TODO: This component is a bit buggy - down arrow selector doesnt work, the drop down appears quite often even when you are selecting a new component? huh?
 
 const BadgeSelector: React.FC<BadgeSelectorProps> = ({
     options,
@@ -20,7 +21,7 @@ const BadgeSelector: React.FC<BadgeSelectorProps> = ({
     placeholder = 'Start typing...',
     label,
     description,
-    maxSuggestions = 5,
+    maxSuggestions = 10,
     allowCustom = true,
 }) => {
     const [inputValue, setInputValue] = useState<string>('');
@@ -77,6 +78,7 @@ const BadgeSelector: React.FC<BadgeSelectorProps> = ({
                 </div>
 
                 <button
+                    type="button"
                     onClick={handleAdd}
                     disabled={!inputValue.trim()}
                     className="px-6 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
@@ -95,6 +97,7 @@ const BadgeSelector: React.FC<BadgeSelectorProps> = ({
                             >
                                 <span>{item}</span>
                                 <button
+                                    type="button"
                                     onClick={() => removeItem(item)}
                                     className="ml-2 text-blue-500 hover:text-blue-900"
                                     aria-label={`Remove ${item}`}

@@ -316,14 +316,23 @@ export default function OnboardingPage() {
     // Form submission
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        console.log('Form submitted:', formData, { selectedMajor, selectedCountry });
+        console.log('Form submitted:', formData, { selectedMajor, selectedCountry, selectedIndustries, selectedCodingLanguages });
         // Add your submission logic here (API call, etc.)
+        if (currentStep < 3) {
+            return; // Don't submit if not on final step
+        }
         alert('Onboarding form submitted successfully!');
-        alert(`Fruit: ${selectedFruit}\nCountry: ${selectedCountry}`);
+        // alert(`Fruit: ${selectedFruit}\nCountry: ${selectedCountry}`);
     };
 
     // Navigation
-    const nextStep = () => setCurrentStep(prev => Math.min(prev + 1, 3));
+    // const nextStep = () => setCurrentStep(prev => Math.min(prev + 1, 3));
+    // Update the nextStep function to accept the event (prevents the form from submitting after pg 2)
+    const nextStep = (e?: React.MouseEvent<HTMLButtonElement>) => {
+        e?.preventDefault();
+        e?.stopPropagation();
+        setCurrentStep(prev => Math.min(prev + 1, 3));
+    };
     const prevStep = () => setCurrentStep(prev => Math.max(prev - 1, 1));
 
 
@@ -367,7 +376,7 @@ export default function OnboardingPage() {
                             <form onSubmit={handleSubmit}>
                                 {/* Step 1: Basic Information */}
                                 {currentStep === 1 && (
-                                    <div className="space-y-6">
+                                    < div className="space-y-6">
                                         <h2 className="text-xl font-semibold text-white mb-4">
                                             BASIC INFO
                                         </h2>
@@ -660,6 +669,7 @@ export default function OnboardingPage() {
                                                 maxSuggestions={5}
                                             />
                                         </div>
+                                        {/* TODO: Add in cities - use an api to do this? */}
 
                                         <div>
                                             <label className="block text-sm font-medium text-white mb-2">
@@ -915,47 +925,6 @@ export default function OnboardingPage() {
                                         <h2 className="text-xl font-semibold text-white mb-4">
                                             SKILLS & RESUME
                                         </h2>
-
-                                        {/* <div>
-                                            <label className="block text-sm font-medium text-white mb-2">
-                                                Skills *
-                                            </label>
-                                            <div className="flex gap-2 mb-2">
-                                                <input
-                                                    type="text"
-                                                    value={skillInput}
-                                                    onChange={(e) => setSkillInput(e.target.value)}
-                                                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddSkill())}
-                                                    className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                                    placeholder="e.g., React, TypeScript, Node.js"
-                                                />
-                                                <button
-                                                    type="button"
-                                                    onClick={handleAddSkill}
-                                                    className="px-4 py-2 bg-[#42e0ff] text-gray-600 rounded-md hover:bg-gray-300"
-                                                >
-                                                    Add
-                                                </button>
-                                            </div>
-                                            <div className="flex flex-wrap gap-2">
-                                                {formData.skills.map(skill => (
-                                                    <span
-                                                        key={skill}
-                                                        className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800"
-                                                    >
-                                                        {skill}
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => handleRemoveSkill(skill)}
-                                                            className="ml-2 text-blue-600 hover:text-blue-800"
-                                                        >
-                                                            ×
-                                                        </button>
-                                                    </span>
-                                                ))}
-                                            </div>
-                                        </div> */}
-
 
                                         <div>
                                             <label htmlFor="experienceLevel" className="block text-sm font-bold text-white mb-2">
