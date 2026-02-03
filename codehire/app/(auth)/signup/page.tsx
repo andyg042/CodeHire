@@ -30,7 +30,7 @@ export default function SignupPage() {
       }
 
       // Redirect after successful signup
-      router.push("/login"); // or "/dashboard"
+      router.push("/onboarding"); // or "/dashboard"
     } catch (err: any) {
       setError(err.message);
     } finally {
