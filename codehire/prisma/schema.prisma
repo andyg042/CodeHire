@@ -41,11 +41,7 @@ enum PayPeriod {
   YEARLY
 }
 
-enum JobSearchStatus {
-  ACTIVE
-  CASUAL
-  NOT_LOOKING
-}
+
 
 // is this well defined? need to ask some questions
 enum CompanyStage {
@@ -65,7 +61,7 @@ model User {
   lastName    String?
 
   profile   UserProfile? // This will be an object type that we define
-  
+
   onboardingCompleted Boolean @default(false)
 
   createdAt   DateTime    @default(now())
@@ -97,7 +93,5 @@ model UserProfile {
   payPeriod         PayPeriod?
 
   resumeUrl         String?
-  jobStatus         JobSearchStatus @default(ACTIVE)
-
 }
 

@@ -84,8 +84,7 @@ export async function POST(req: Request) {
       industries: industriesArray,
       minimumPay: body.pay ? parseInt(body.pay, 10) : null,
       payPeriod: body.payPeriod?.toUpperCase() as any, // Convert 'hourly' to 'HOURLY'
-      resumeUrl: body.resumeUrl || null,
-      jobStatus: body.jobStatus || 'ACTIVE',
+      resumeUrl: body.resumeUrl || null
     };
 
     console.log("Transformed profile data:", profileData);
