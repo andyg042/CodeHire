@@ -31,12 +31,13 @@ export default function SignupPage() {
         throw new Error(data.message || "Signup failed");
       }
 
-      //Immediately signs them in
+      // Immediately signs them in
       const signInResult = await signIn("credentials", {
         email,
         password,
         redirect: false,
       });
+
       if (signInResult?.ok) {
         router.push("/onboarding");
       }

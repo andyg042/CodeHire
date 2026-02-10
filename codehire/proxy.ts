@@ -12,11 +12,18 @@ export async function proxy(request: Request) {
   const url = new URL(request.url)
   const isLoggedIn = !!reqAuth
 
-  // Redirect unauthenticated users to NextAuth signin
-  if (!isLoggedIn) {
-    const signInUrl = new URL("/api/auth/signin", url.origin)
-    signInUrl.searchParams.set("callbackUrl", url.href) // preserve original URL
-    return NextResponse.redirect(signInUrl)
+  // Public routes (do NOT protect these)
+  const isPublicRoute =
+    url.pathname.startsWith("/signup") ||
+    url.pathname.startsWith("/login") ||
+    url.pathname.startsWith("/onboarding") ||
+    url.pathname.startsWith("/api/auth")
+
+  // Redirect unauthenticated users to YOUR signup page
+  if (!isLoggedIn && !isPublicRoute) {
+    return NextResponse.redirect(
+      new URL("/signup", url.origin)
+    )
   }
 
   // Allow request to continue
@@ -24,5 +31,5 @@ export async function proxy(request: Request) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/app/:path*"],
+  matcher: ["/dashboard/:path*", "/app/:path*", "/onboarding"],
 }
