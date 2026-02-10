@@ -134,12 +134,26 @@ export default function Jobs() {
                 </div>
               </section>
 
-              {/* Locations */}
+              {/* Locations - make into a search bar then have check boxes with locations */}
               <section className="mb-6">
                 <h3 className="text-yellow-600 font-bold text-sm mb-3 uppercase tracking-wide">
                   Locations
                 </h3>
+                {/* Search bar div */}
                 <div className="space-y-2.5">
+
+                </div>
+
+                <div className="space-y-2.5">
+                  <div className="bg-[#313749] space-y-2.5 shadow border border-gray-300 rounded px-3 py-2 focus:outline-none ">
+                    <p className="text-sm font-semibold">Search Bar</p>
+                  </div>
+                  <input
+                    type="text"
+                    name="locationQuery"
+                    value=""
+                    className=" text-sm w-full bg-[#626C88] space-y-2.5 shadow border border-gray-300 rounded px-3 py-2  ">
+                  </input>
                   <FilterCheckbox category="locations" value="nyc" label="New York City" />
                   <FilterCheckbox category="locations" value="la" label="Los Angeles" />
                   <FilterCheckbox category="locations" value="sf" label="San Francisco" />
@@ -165,9 +179,11 @@ export default function Jobs() {
                   className="w-full bg-[#313749] border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
                 >
                   <option value="most-recent">Most Recent</option>
-                  <option value="last-24h">Last 24 Hours</option>
-                  <option value="last-week">Last Week</option>
-                  <option value="last-month">Last Month</option>
+                  <option value="3-days">3 Days</option>
+                  <option value="week">Week</option>
+                  <option value="past-month"> Past month</option>
+                  <option value="all">all</option>
+
                 </select>
               </section>
 
@@ -177,6 +193,12 @@ export default function Jobs() {
                   Languages
                 </h3>
                 <div className="space-y-2.5">
+                  <input
+                    type="text"
+                    name="locationQuery"
+                    value=""
+                    className=" text-sm w-full bg-[#626C88] space-y-2.5 shadow border border-gray-300 rounded px-3 py-2  ">
+                  </input>
                   <FilterCheckbox category="languages" value="python" label="Python" />
                   <FilterCheckbox category="languages" value="cpp" label="C++" />
                   <FilterCheckbox category="languages" value="java" label="Java" />
