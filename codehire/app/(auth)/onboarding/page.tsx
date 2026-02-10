@@ -319,8 +319,12 @@ export default function OnboardingPage() {
     };
 
     // Form submission
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (currentStep < 3) {
+            return; // Don't submit if not on final step
+        }
         // Merge separate state into formData right before using it
         const completeFormData = {
             ...formData,
@@ -331,16 +335,32 @@ export default function OnboardingPage() {
             payPeriod: payType
         };
         console.log('Form submitted:', completeFormData);
+        
+        // Submit form data to API endpoint
+        try {
+            const response = await fetch('/api/onboarding', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include', // Include cookies for authentication
+                body: JSON.stringify(completeFormData),
+            });
 
+            const result = await response.json();
 
-
-        // console.log('Form submitted:', formData, { selectedMajor, selectedCountry, selectedIndustries, selectedCodingLanguages });
-        // Add your submission logic here (API call, etc.)
-        if (currentStep < 3) {
-            return; // Don't submit if not on final step
+            if (response.ok && result.success) {
+                alert('Onboarding form submitted successfully!');
+                // Redirect to dashboard or home page
+                window.location.href = '/dashboard'; // or use router.push('/dashboard') if using next/navigation
+            } else {
+                alert(`Error: ${result.error || 'Failed to submit form'}`);
+                console.error('Submission error:', result);
+            }
+        } catch (error) {
+            console.error('Error submitting form:', error);
+            alert('An error occurred while submitting the form. Please try again.');
         }
-        alert('Onboarding form submitted successfully!');
-        // alert(`Fruit: ${selectedFruit}\nCountry: ${selectedCountry}`);
     };
 
     // Navigation

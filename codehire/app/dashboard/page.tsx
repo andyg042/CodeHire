@@ -41,10 +41,22 @@
 
 import { useState } from "react";
 import jobsData from "../../data/jobs.json";
+import { auth } from '@/auth';
+import { redirect } from 'next/navigation';
 
-export default function Jobs() {
+export default function Dashboard() {
   // Initialize state with JSON data
   const [jobs, setJobs] = useState(jobsData);
+
+  // Example of using auth to check if user is logged in
+  auth().then(session => {
+    if (!session) {
+      redirect('/auth/login');
+    }
+    if (session && !session.user.onboardingCompleted) {
+      redirect('/onboarding');
+    }
+  });
 
   return (
     <div className="max-w-4xl mx-auto p-6">

@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/prisma'
 import Navbar from "./components/navbar"
 import Link from 'next/link'
-import { auth } from '@/app/api/auth/[...nextauth]/route'
+import { auth } from '@/auth'
 import { User } from './user'
 import { LogoutButton, LoginButton } from './auth-buttons'
 import Hero from './components/hero'
