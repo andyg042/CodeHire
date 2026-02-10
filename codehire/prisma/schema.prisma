@@ -41,11 +41,6 @@ enum PayPeriod {
   YEARLY
 }
 
-enum JobSearchStatus {
-  ACTIVE
-  CASUAL
-  NOT_LOOKING
-}
 
 // is this well defined? need to ask some questions
 enum CompanyStage {
@@ -97,7 +92,6 @@ model UserProfile {
   payPeriod         PayPeriod?
 
   resumeUrl         String?
-  jobStatus         JobSearchStatus @default(ACTIVE)
 
 }
 
