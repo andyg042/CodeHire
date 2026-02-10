@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation";
 
 export default function SignupPage() {
@@ -15,6 +16,7 @@ export default function SignupPage() {
     setLoading(true);
     setError(null);
 
+    //creates user
     try {
       const res = await fetch("/api/auth/signup", {
         method: "POST",
@@ -29,11 +31,18 @@ export default function SignupPage() {
         throw new Error(data.message || "Signup failed");
       }
 
-      // Redirect after successful signup
-      router.push("/onboarding"); // or "/dashboard"
+      //Immediately signs them in
+      const signInResult = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
+      if (signInResult?.ok) {
+        router.push("/onboarding");
+      }
+      
     } catch (err: any) {
-      setError(err.message);
-    } finally {
+      setError(err.message || "An unexpected error occurred");
       setLoading(false);
     }
   };

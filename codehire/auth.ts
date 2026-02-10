@@ -5,6 +5,10 @@ import { compare } from "bcrypt"
 import { prisma } from "@/lib/prisma"
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+    session: {
+        strategy: "jwt"
+    },
+
   providers: [
     CredentialsProvider({
         name: "Sign in",
@@ -39,10 +43,33 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             };
         },
     }),
+
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
   ],
+
+  callbacks: {
+    async jwt({ token, user }) {
+      // runs on sign-in
+      if (user) {
+        token.id = user.id
+        token.email = user.email
+        token.name = user.name
+      }
+      return token
+    },
+
+    async session({ session, token }) {
+      if (session.user) {
+        session.user.id = token.id as string
+        session.user.email = token.email as string
+        session.user.name = token.name as string
+      }
+      return session
+    },
+  },
+
   secret: process.env.NEXTAUTH_SECRET,
 })

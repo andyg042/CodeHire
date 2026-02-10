@@ -1,4 +1,8 @@
-import { handlers } from "@/auth"
+// app/api/debug-auth/route.ts
+import { auth } from "@/auth"
+import { NextResponse } from "next/server"
 
-export const GET = handlers.GET
-export const POST = handlers.POST
+export async function GET() {
+  const session = await auth()
+  return NextResponse.json({ session })
+}
