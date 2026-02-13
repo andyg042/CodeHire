@@ -325,15 +325,65 @@ export default function OnboardingPage() {
         if (currentStep < 3) {
             return; // Don't submit if not on final step
         }
+
+        // Transform employment types from object to array
+        const employmentTypes = [];
+        if (formData.jobPreferences.fullTime) employmentTypes.push('FULL_TIME');
+        if (formData.jobPreferences.partTime) employmentTypes.push('PART_TIME');
+        if (formData.jobPreferences.contract) employmentTypes.push('CONTRACT');
+        if (formData.jobPreferences.internship) employmentTypes.push('INTERNSHIP');
+        if (formData.jobPreferences.coOp) employmentTypes.push('CO_OP');
+
+         // Transform work modes from object to array
+        const workModes = [];
+        if (formData.workLocations.remote) workModes.push('REMOTE');
+        if (formData.workLocations.hybrid) workModes.push('HYBRID');
+        if (formData.workLocations.inPerson) workModes.push('IN_PERSON');
+
+        // Transform company stages from object to array
+        const companyStages = [];
+        if (formData.companyStages.startup) companyStages.push('STARTUP');
+        if (formData.companyStages.earlyStage) companyStages.push('EARLY_STAGE');
+        if (formData.companyStages.publicTech) companyStages.push('PUBLIC_TECH');
+
+        // Transform industries from object to array
+        const industries = [];
+        if (formData.industries.aerospace) industries.push('AEROSPACE');
+        if (formData.industries.artsEntertainment) industries.push('ARTS_ENTERTAINMENT');
+        if (formData.industries.defense) industries.push('DEFENSE');
+        if (formData.industries.education) industries.push('EDUCATION');
+        if (formData.industries.energy) industries.push('ENERGY');
+        if (formData.industries.financeInsurance) industries.push('FINANCE_INSURANCE');
+        if (formData.industries.governmentPublicAdministration) industries.push('GOVERNMENT_PUBLIC_ADMINISTRATION');
+        if (formData.industries.healthcare) industries.push('HEALTHCARE');
+        if (formData.industries.informationTechnology) industries.push('INFORMATION_TECHNOLOGY');
+        if (formData.industries.manufacturing) industries.push('MANUFACTURING');
+        if (formData.industries.mediaCommunication) industries.push('MEDIA_COMMUNICATION');
+        if (formData.industries.professionalBusinessServices) industries.push('PROFESSIONAL_BUSINESS_SERVICES');
+        if (formData.industries.retail) industries.push('RETAIL');
+
+        // Map experience level to job level array
+        const jobLevels = formData.experienceLevel ? [formData.experienceLevel.toUpperCase()] : [];
+        
         // Merge separate state into formData right before using it
         const completeFormData = {
-            ...formData,
-            major: selectedMajor,
-            location: selectedCountry,
-            jobTitles: selectedJobs,
-            codingLanguages: selectedCodingLanguages,
-            payPeriod: payType
-        };
+        major: selectedMajor,
+        graduationMonth: formData.graduationMonth,
+        graduationYear: Number(formData.graduationYear),
+        skills: formData.skills,
+        codingLanguages: selectedCodingLanguages,
+        jobLevels: jobLevels,
+        employmentTypes: employmentTypes,
+        workModes: workModes,
+        preferredLocations: selectedCountry ? [selectedCountry] : [],
+        companyStages: companyStages,
+        jobRoles: selectedJobs,
+        industries: industries,
+        minimumPay: Number(formData.pay),
+        payPeriod: payType.toUpperCase(), // 'HOURLY' or 'YEARLY'
+        resumeUrl: null, // Handle file upload separately if needed
+        jobStatus: 'ACTIVELY_LOOKING' // Default value, you can add this to the form if needed
+    };
         console.log('Form submitted:', completeFormData);
         
         // Submit form data to API endpoint

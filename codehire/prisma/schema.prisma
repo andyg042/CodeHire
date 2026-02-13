@@ -34,22 +34,20 @@ enum WorkMode {
   REMOTE
   HYBRID
   IN_PERSON
-}
+};
 
 enum PayPeriod {
   HOURLY
   YEARLY
 }
 
-
-
 // is this well defined? need to ask some questions
 enum CompanyStage {
 
-  Early_Stage 
-  Startups
-  Public_Tech
-  Faang
+  EARLY_STAGE 
+  STARTUP
+  PUBLIC_TECH
+  FAANG
 
 }
 
