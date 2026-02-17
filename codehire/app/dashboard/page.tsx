@@ -43,11 +43,54 @@ import { useState } from "react";
 import jobsData from "../../data/jobs.json";
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
+import SearchCheckboxes from "../components/SearchCheckboxes";
 
 export default function Jobs() {
 
   // Initialize state with JSON data
   const [jobs] = useState(jobsData);
+  const [selectedCodingLanguages, setSelectedCodingLanguages] = useState<string[]>([]);
+  const [selectedCountry, setSelectedCountry] = useState<string[]>([]);
+
+
+  const CODING_LANGUAGES = [
+    'JavaScript',
+    'TypeScript',
+    'Python',
+    'Java',
+    'C++',
+    'C#',
+    'Ruby',
+    'React',
+    'HTML',
+    'CSS',
+    'Go',
+    'Rust',
+    'Swift',
+    'Kotlin',
+    'PHP',
+    'SQL',
+    'R',
+    'Scala',
+    'Matlab',
+    'SQL',
+  ];
+
+  const countries = [
+    'United States',
+    'United Kingdom',
+    'Canada',
+    'Australia',
+    'Germany',
+    'France',
+    'Italy',
+    'Spain',
+    'Japan',
+    'China',
+    'India',
+    'Brazil',
+    'Mexico',
+  ];
 
   // Filter state
   const [filters, setFilters] = useState({
@@ -103,17 +146,41 @@ export default function Jobs() {
     </label>
   );
 
+  const extractLanguages = (jobQualifications: string[]) => {
+    let descriptionLanguages: string[] = [];
+
+    // const punctuationRegex = /[\p{P}]/gu;
+
+    for (const sentence of jobQualifications) {
+      // let result = sentence.replace(punctuationRegex, "");
+      let result = sentence.replace(/[.,]/g, " ");
+      console.log(result)
+
+      const words: string[] = result.split(" ");
+      console.log(words)
+
+      words.forEach((word) => {
+        CODING_LANGUAGES.forEach((language) => {
+          // word.localeCompare(language, undefined, { sensitivity: 'base' })
+          if (word === language) {
+            if (!descriptionLanguages.includes(word)) {
+              descriptionLanguages.push(word);
+            }
+          }
+        });
+      });
+    }
+    console.log(descriptionLanguages);
+
+    return descriptionLanguages;
+  }
+
 
   return (
 
     <div className="max-w-7xl mx-auto p-6">
       {/* Contains everything */}
       <div className="flex flex-col gap-5">
-
-        {/* Search bar div */}
-        <div className="bg-[#313749] rounded-lg shadow p-4">
-          <p className="text-lg font-semibold">Search Bar</p>
-        </div>
 
         {/* Filters & Job Card List */}
         <div className="flex flex-row gap-5">
@@ -147,15 +214,36 @@ export default function Jobs() {
                 </div>
 
                 <div className="space-y-2.5">
-                  <div className="bg-[#313749] space-y-2.5 shadow border border-gray-300 rounded px-3 py-2 focus:outline-none ">
-                    <p className="text-sm font-semibold">Search Bar</p>
-                  </div>
-                  <input
+
+                  {/* <input
                     type="text"
                     name="locationQuery"
                     value=""
                     className=" text-sm w-full bg-[#626C88] space-y-2.5 shadow border border-gray-300 rounded px-3 py-2  ">
-                  </input>
+                  </input> */}
+
+
+                  <div className="max-w-2xl mx-auto">
+                    <SearchCheckboxes
+                      options={countries}
+                      selectedItems={selectedCountry}
+                      onSelectionChange={setSelectedCountry}
+                      placeholder="Search for a location..."
+                      maxSuggestions={5}
+                    />
+
+                    {/* Display selected languages */}
+                    <div className="mt-8 p-4 bg-blue-50 rounded-lg">
+                      <h2 className="font-semibold mb-2">Selected Languages:</h2>
+                      <p className="text-sm text-gray-700">
+                        {selectedCountry.length > 0
+                          ? selectedCountry.join(', ')
+                          : 'None selected'}
+                      </p>
+                    </div>
+                  </div>
+
+
                   <FilterCheckbox category="locations" value="nyc" label="New York City" />
                   <FilterCheckbox category="locations" value="la" label="Los Angeles" />
                   <FilterCheckbox category="locations" value="sf" label="San Francisco" />
@@ -195,12 +283,42 @@ export default function Jobs() {
                   Languages
                 </h3>
                 <div className="space-y-2.5">
-                  <input
+                  {/* <input
                     type="text"
                     name="locationQuery"
                     value=""
-                    className=" text-sm w-full bg-[#626C88] space-y-2.5 shadow border border-gray-300 rounded px-3 py-2  ">
-                  </input>
+                    className=" text-sm w-full bg-[#626C88] space-y-2.5 shadow border border-gray-300 rounded px-3 py-2 "
+                    placeholder="Search Languages">
+                  </input> */}
+
+                  {/* <SearchCheckboxes
+                    options={CODING_LANGUAGES}
+                    selectedItems={selectedCodingLanguages}
+                    onSelectionChange={setSelectedCodingLanguages}
+                    allowCustom={false}
+
+                  /> */}
+
+                  <div className="max-w-2xl mx-auto">
+
+                    <SearchCheckboxes
+                      options={CODING_LANGUAGES}
+                      selectedItems={selectedCodingLanguages}
+                      onSelectionChange={setSelectedCodingLanguages}
+                      placeholder="Search for a language..."
+                      maxSuggestions={5}
+                    />
+
+                    {/* Display selected languages */}
+                    <div className="mt-8 p-4 bg-blue-50 rounded-lg">
+                      <h2 className="font-semibold mb-2">Selected Languages:</h2>
+                      <p className="text-sm text-gray-700">
+                        {selectedCodingLanguages.length > 0
+                          ? selectedCodingLanguages.join(', ')
+                          : 'None selected'}
+                      </p>
+                    </div>
+                  </div>
                   <FilterCheckbox category="languages" value="python" label="Python" />
                   <FilterCheckbox category="languages" value="cpp" label="C++" />
                   <FilterCheckbox category="languages" value="java" label="Java" />
@@ -230,6 +348,10 @@ export default function Jobs() {
                     <p className="text-gray-500">
                       {job.job_city}, {job.job_country}
                     </p>
+                    <p> {job.job_highlights.Qualifications}</p>
+                    <p> {extractLanguages(job.job_highlights.Qualifications)}</p>
+
+
                   </div>
                 ))}
               </div>

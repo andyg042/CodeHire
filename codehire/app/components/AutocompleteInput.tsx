@@ -147,7 +147,7 @@ export default function AutocompleteInput({
                     }
                 }}
                 placeholder={placeholder}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#42e0ff] focus:border-white outline-none transition"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#42e0ff] focus:border-white outline-none transition placeholder: text-sm"
                 autoComplete="off"
             />
 
