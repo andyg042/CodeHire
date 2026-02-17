@@ -74,6 +74,10 @@ export default function Jobs() {
     'Scala',
     'Matlab',
     'SQL',
+    'PyTorch',
+    'TensorFlow',
+    'Pandas',
+    'NumPy',
   ];
 
   const countries = [
@@ -146,34 +150,46 @@ export default function Jobs() {
     </label>
   );
 
+  //extract the coding languages and libraries from job description and display them in pill-shaped badges
   const extractLanguages = (jobQualifications: string[]) => {
     let descriptionLanguages: string[] = [];
 
-    // const punctuationRegex = /[\p{P}]/gu;
-
     for (const sentence of jobQualifications) {
-      // let result = sentence.replace(punctuationRegex, "");
-      let result = sentence.replace(/[.,]/g, " ");
-      console.log(result)
-
+      let result = sentence.replace(/[.,]/g, " "); //remove commas and periods
       const words: string[] = result.split(" ");
-      console.log(words)
 
+      //search word list for coding languages
       words.forEach((word) => {
         CODING_LANGUAGES.forEach((language) => {
-          // word.localeCompare(language, undefined, { sensitivity: 'base' })
-          if (word === language) {
+          if (word.toUpperCase() === language.toUpperCase()) {
             if (!descriptionLanguages.includes(word)) {
-              descriptionLanguages.push(word);
+              //add to list
+              descriptionLanguages.push(language);
             }
           }
         });
       });
     }
-    console.log(descriptionLanguages);
 
-    return descriptionLanguages;
+    return (
+      <div className="flex flex-wrap gap-2">
+
+        {/* the .map() loops over the array and returns a new array, an array of <span> elements - use map to render an array in reach instead of .forEach, which doesn't return anything */}
+        {/* rendering a list with .map(), Rach requires each item to have a unique key prop - how react updeates the UI effeicntly w/ out have ing to rerender everything */}
+        {descriptionLanguages.map((language) => (
+          < span
+            key={language}
+            className="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm" >
+            {language}
+          </span >
+        ))
+        }
+      </div >
+
+    )
   }
+
+
 
 
   return (
@@ -348,8 +364,10 @@ export default function Jobs() {
                     <p className="text-gray-500">
                       {job.job_city}, {job.job_country}
                     </p>
-                    <p> {job.job_highlights.Qualifications}</p>
-                    <p> {extractLanguages(job.job_highlights.Qualifications)}</p>
+                    {/* <p> {job.job_highlights.Qualifications}</p> */}
+                    <div className="mt-2">{extractLanguages(job.job_highlights.Qualifications)}</div>
+
+
 
 
                   </div>
