@@ -6,10 +6,13 @@ import { prisma } from "@/lib/prisma"
 import { compare } from "bcryptjs"
 
 const { auth, handlers, signIn, signOut } = NextAuth({
-    session: { 
-        strategy: "jwt" 
-    },
+  session: { 
+      strategy: "jwt" 
+  },
 
+  pages: {
+    signIn: "/login",
+  },
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -63,5 +66,6 @@ const { auth, handlers, signIn, signOut } = NextAuth({
     return session
   }
 },
+
   secret: process.env.NEXTAUTH_SECRET,
 })

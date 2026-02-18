@@ -3,7 +3,7 @@ import Navbar from "./components/navbar"
 import Link from 'next/link'
 import { auth } from '@/auth'
 import { User } from './user'
-import { LogoutButton, LoginButton } from './auth-buttons'
+import { LogoutButton, LoginButton } from './components/auth-buttons'
 import Hero from './components/hero'
 import HowItWorks from './components/howItWorks'
 
