@@ -355,20 +355,31 @@ export default function Jobs() {
 
               <div className="grid gap-4">
                 {filteredJobs.map((job) => (
+                  //whole job card
                   <div
                     key={job.job_id}
-                    className="border rounded-lg p-5 shadow-sm hover:shadow-md transition"
+                    className="border rounded-lg p-5 shadow-sm hover:shadow-md transition flex flex-row gap-3.5"
                   >
-                    <h2 className="text-xl font-semibold">{job.job_title}</h2>
-                    <p className="font-medium text-gray-700">{job.employer_name}</p>
-                    <p className="text-gray-500">
-                      {job.job_city}, {job.job_country}
-                    </p>
-                    {/* <p> {job.job_highlights.Qualifications}</p> */}
-                    <div className="mt-2">{extractLanguages(job.job_highlights.Qualifications)}</div>
+                    <div>
+                      {job.employer_logo && (
+                        <img
+                          src={job.employer_logo}
+                          alt={`${job.employer_name} logo`}
+                          className="h-12 w-12 object-contain mb-2 border rounded-md"
+                        />
+                      )}
+                    </div>
 
-
-
+                    <div>
+                      <h2 className="text-xl font-semibold">{job.job_title}</h2>
+                      <p className="font-medium text-gray-700">{job.employer_name}</p>
+                      <p className="text-gray-500">
+                        {job.job_city}, {job.job_country}
+                      </p>
+                      <div className="mt-2">{extractLanguages(job.job_highlights.Qualifications)}</div>
+                      <div className="mt-2"> {((job.job_min_salary !== null) && (job.job_max_salary !== null)) ? (<div>${job.job_min_salary} - ${job.job_max_salary}</div>) : ("")} </div>
+                      <div className="mt-2  text-gray-700"> {job.job_posted_at} </div>
+                    </div>
 
                   </div>
                 ))}
