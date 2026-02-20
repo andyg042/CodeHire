@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { LoginButton, LogoutButton } from '../auth-buttons'
+import { LoginButton, LogoutButton } from './auth-buttons'
 
 
 export default function Navbar({ session }: { session: any }) {

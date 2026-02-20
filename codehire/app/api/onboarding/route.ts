@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { JobLevel, EmploymentType, WorkMode, CompanyStage } from "@prisma/client";
+import { JobLevel, EmploymentType, WorkMode, CompanyStage, PayPeriod } from "@prisma/client";
 
 export async function POST(req: Request) {
   try {
@@ -19,71 +19,75 @@ export async function POST(req: Request) {
     const body = await req.json();
     console.log("Received body:", body);
 
-    // Transform job preferences object to enum array
-    const employmentTypesArray: EmploymentType[] = [];
-    if (body.jobPreferences?.fullTime) employmentTypesArray.push(EmploymentType.FULL_TIME);
-    if (body.jobPreferences?.partTime) employmentTypesArray.push(EmploymentType.PART_TIME);
-    if (body.jobPreferences?.contract) employmentTypesArray.push(EmploymentType.CONTRACT);
-    if (body.jobPreferences?.internship || body.jobPreferences?.coOp) {
-      // Map internship/co-op to TEMPORARY or you can add these to your enum
-      employmentTypesArray.push(EmploymentType.TEMPORARY);
-    }
+    // Validate and transform employmentTypes to enum array
+    const employmentTypesArray: EmploymentType[] = (body.employmentTypes || [])
+      .map((type: string) => {
+        const upperType = type.toUpperCase();
+        if (Object.values(EmploymentType).includes(upperType as EmploymentType)) {
+          return upperType as EmploymentType;
+        }
+        return null;
+      })
+      .filter(Boolean)
 
-    // Transform work locations object to enum array
-    const workModesArray: WorkMode[] = [];
-    if (body.workLocations?.remote) workModesArray.push(WorkMode.REMOTE);
-    if (body.workLocations?.hybrid) workModesArray.push(WorkMode.HYBRID);
-    if (body.workLocations?.inPerson) workModesArray.push(WorkMode.IN_PERSON);
-
-    // Transform company stages object to enum array
-    const companyStageMap: Record<string, CompanyStage> = {
-      startup: CompanyStage.Startups,
-      earlyStage: CompanyStage.Early_Stage,
-      publicTech: CompanyStage.Public_Tech,
-      faang: CompanyStage.Faang,
-    };
-
-    const companyStagesArray = Object.entries(body.companyStages || {})
-      .filter(([_, value]) => value === true)
-      .map(([key]) => companyStageMap[key])
+    // Validate and transform workModes to enum array
+    const workModesArray: WorkMode[] = (body.workModes || [])
+      .map((mode: string) => {
+        const upperMode = mode.toUpperCase();
+        if (Object.values(WorkMode).includes(upperMode as WorkMode)) {
+          return upperMode as WorkMode;
+        }
+        return null;
+      })
       .filter(Boolean);
 
-    // Transform industries object to string array
-    const industriesArray = Object.entries(body.industries || {})
-      .filter(([_, value]) => value === true)
-      .map(([key]) => {
-        // Convert camelCase to Title Case with spaces
-        return key.replace(/([A-Z])/g, ' $1').trim();
-      });
+    // Validate and transform companyStages to enum array
+    const companyStagesArray: CompanyStage[] = (body.companyStages || [])
+      .map((stage: string) => {
+        // CompanyStage enum values in schema: Early_Stage, Startups, Public_Tech, Faang
+        if (Object.values(CompanyStage).includes(stage as CompanyStage)) {
+          return stage as CompanyStage;
+        }
+        return null;
+      })
+      .filter(Boolean);
 
-    // Map experience level to JobLevel enum
-    const jobLevelMap: Record<string, JobLevel> = {
-      entry: JobLevel.JUNIOR,
-      mid: JobLevel.MID,
-      senior: JobLevel.SENIOR,
-      lead: JobLevel.LEAD,
-    };
+    // Validate and transform jobLevels to enum array
+    const jobLevelsArray: JobLevel[] = (body.jobLevels || [])
+      .map((level: string) => {
+        const upperLevel = level.toUpperCase();
+        if (Object.values(JobLevel).includes(upperLevel as JobLevel)) {
+          return upperLevel as JobLevel;
+        }
+        return null;
+      })
+      .filter(Boolean);
 
-    const jobLevelsArray = body.experienceLevel 
-      ? [jobLevelMap[body.experienceLevel] || JobLevel.JUNIOR]
-      : [];
+    // Validate payPeriod
+    let payPeriodValue: PayPeriod | null = null;
+    if (body.payPeriod) {
+      const upperPayPeriod = body.payPeriod.toUpperCase();
+      if (Object.values(PayPeriod).includes(upperPayPeriod as PayPeriod)) {
+        payPeriodValue = upperPayPeriod as PayPeriod;
+      }
+    }
 
     // Build the profile data
     const profileData = {
       major: body.major || null,
       graduationMonth: body.graduationMonth || null,
       graduationYear: body.graduationYear ? parseInt(body.graduationYear, 10) : null,
-      skills: body.skills ?? [],
-      codingLanguages: body.codingLanguages ?? [],
+      skills: Array.isArray(body.skills) ? body.skills : [],
+      codingLanguages: Array.isArray(body.codingLanguages) ? body.codingLanguages : [],
       jobLevels: jobLevelsArray,
       employmentTypes: employmentTypesArray,
       workModes: workModesArray,
-      preferredLocations: body.location ? [body.location] : [],
+      preferredLocations: Array.isArray(body.preferredLocations) ? body.preferredLocations : [],
       companyStages: companyStagesArray,
-      jobRoles: body.jobTitles ?? [],
-      industries: industriesArray,
-      minimumPay: body.pay ? parseInt(body.pay, 10) : null,
-      payPeriod: body.payPeriod?.toUpperCase() as any, // Convert 'hourly' to 'HOURLY'
+      jobRoles: Array.isArray(body.jobRoles) ? body.jobRoles : [],
+      industries: Array.isArray(body.industries) ? body.industries : [],
+      minimumPay: body.minimumPay ? parseInt(body.minimumPay, 10) : null,
+      payPeriod: payPeriodValue,
       resumeUrl: body.resumeUrl || null
     };
 

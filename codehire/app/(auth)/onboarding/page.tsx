@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import AutocompleteInput from '../../components/AutocompleteInput';
 import BadgeSelector from '../../components/BadgeSelector';
-import { PayPeriod } from '@prisma/client';
+// import { PayPeriod } from '@prisma/client';
 
 
 
@@ -13,52 +13,20 @@ interface OnboardingFormData {
     major: string;
     graduationYear: number;
     graduationMonth: string;
-    jobTitles: string[];
+    jobRoles: string[];
     experienceLevel: string;
-    jobPreferences: {
-        fullTime: boolean;
-        partTime: boolean;
-        contract: boolean;
-        internship: boolean;
-        coOp: boolean;
-
-    };
-    workLocations: {
-        remote: boolean;
-        hybrid: boolean;
-        inPerson: boolean;
-    };
-    companyStages: {
-        startup: boolean;
-        earlyStage: boolean;
-        publicTech: boolean;
-        faang: boolean;
-    };
-    industries: {
-        aerospace: boolean;
-        artsEntertainment: boolean;
-        defense: boolean;
-        education: boolean;
-        energy: boolean;
-        financeInsurance: boolean;
-        governmentPublicAdministration: boolean;
-        healthcare: boolean;
-        informationTechnology: boolean;
-        manufacturing: boolean;
-        mediaCommunication: boolean;
-        professionalBusinessServices: boolean;
-        retail: boolean;
-    }
+    employmentTypes: string[];
+    workModes: string[];
+    companyStages: string[];
+    industries: string[];
     pay: number;
-    payPeriod: {
-        hourly: boolean;
-        yearly: boolean;
-    };
+    payPeriod: 'HOURLY' | 'YEARLY';
     skills: string[];
     codingLanguages: string[];
-    location: string;
+    preferredLocations: string[];
     resume?: File | null;
 }
+
 
 // Initial form state
 const initialFormData: OnboardingFormData = {
@@ -66,49 +34,17 @@ const initialFormData: OnboardingFormData = {
     major: '',
     graduationMonth: '',
     graduationYear: 0,
-    jobTitles: [],
+    jobRoles: [],
     experienceLevel: '',
-    jobPreferences: {
-        fullTime: false,
-        partTime: false,
-        contract: false,
-        internship: false,
-        coOp: false,
-    },
-    workLocations: {
-        remote: false,
-        hybrid: false,
-        inPerson: false,
-    },
-    companyStages: {
-        startup: false,
-        earlyStage: false,
-        publicTech: false,
-        faang: false,
-    },
-    industries: {
-        aerospace: false,
-        artsEntertainment: false,
-        defense: false,
-        education: false,
-        energy: false,
-        financeInsurance: false,
-        governmentPublicAdministration: false,
-        healthcare: false,
-        informationTechnology: false,
-        manufacturing: false,
-        mediaCommunication: false,
-        professionalBusinessServices: false,
-        retail: false,
-    },
+    employmentTypes: [],
+    workModes: [],
+    companyStages: [],
+    industries: [],
     pay: 0,
-    payPeriod: {
-        hourly: false,
-        yearly: false,
-    },
+    payPeriod: 'HOURLY',
     skills: [],
     codingLanguages: [],
-    location: '',
+    preferredLocations: [],
     resume: null,
 };
 
@@ -116,14 +52,6 @@ export default function OnboardingPage() {
     const [formData, setFormData] = useState<OnboardingFormData>(initialFormData);
     const [currentStep, setCurrentStep] = useState(1);
     const [skillInput, setSkillInput] = useState('');
-
-    const [selectedFruit, setSelectedFruit] = useState('');
-    const [selectedCountry, setSelectedCountry] = useState('');
-    const [selectedMajor, setSelectedMajor] = useState('');
-    const [selectedJobs, setSelectedJobs] = useState<string[]>([]);
-    const [selectedCodingLanguages, setSelectedCodingLanguages] = useState<string[]>([]);
-    const [selectedIndustries, setSelectedIndustries] = useState<string[]>([]);
-    const [payType, setPayType] = useState<'hourly' | 'yearly'>('hourly');
 
     const majors = [
         'Artificial Intelligence (AI) & Machine Learning',
@@ -242,51 +170,44 @@ export default function OnboardingPage() {
 
 
 
-    // Update job preferences checkboxes
-    const handleJobPreferenceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, checked } = e.target;
+    // Toggle employment type in array
+    const toggleEmploymentType = (type: string) => {
         setFormData(prev => ({
             ...prev,
-            jobPreferences: {
-                ...prev.jobPreferences,
-                [name]: checked,
-            },
+            employmentTypes: prev.employmentTypes.includes(type)
+                ? prev.employmentTypes.filter(t => t !== type)
+                : [...prev.employmentTypes, type]
         }));
     };
 
-    // Update work locations preferences checkboxes
-    const handleWorkLocationsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, checked } = e.target;
+    // Toggle work mode in array
+    const toggleWorkMode = (mode: string) => {
         setFormData(prev => ({
             ...prev,
-            workLocations: {
-                ...prev.workLocations,
-                [name]: checked,
-            },
+            workModes: prev.workModes.includes(mode)
+                ? prev.workModes.filter(m => m !== mode)
+                : [...prev.workModes, mode]
         }));
     };
 
-    // Update job preferences checkboxes
-    const handleCompanyStagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, checked } = e.target;
+    // Toggle company stage in array
+    const toggleCompanyStage = (stage: string) => {
         setFormData(prev => ({
             ...prev,
-            companyStages: {
-                ...prev.companyStages,
-                [name]: checked,
-            },
+            companyStages: prev.companyStages.includes(stage)
+                ? prev.companyStages.filter(s => s !== stage)
+                : [...prev.companyStages, stage]
         }));
     };
 
-    // Update job industry checkboxes
-    const handleIndustriesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, checked } = e.target;
+
+    // Toggle industry in array
+    const toggleIndustry = (industry: string) => {
         setFormData(prev => ({
             ...prev,
-            industries: {
-                ...prev.industries,
-                [name]: checked,
-            },
+            industries: prev.industries.includes(industry)
+                ? prev.industries.filter(i => i !== industry)
+                : [...prev.industries, industry]
         }));
     };
 
@@ -325,16 +246,40 @@ export default function OnboardingPage() {
         if (currentStep < 3) {
             return; // Don't submit if not on final step
         }
-        // Merge separate state into formData right before using it
-        const completeFormData = {
-            ...formData,
-            major: selectedMajor,
-            location: selectedCountry,
-            jobTitles: selectedJobs,
-            codingLanguages: selectedCodingLanguages,
-            payPeriod: payType
+
+        // Map experience level to JobLevel enum
+        const jobLevelMap: Record<string, string> = {
+            entry: 'JUNIOR',
+            mid: 'MID',
+            senior: 'SENIOR',
+            lead: 'LEAD',
         };
-        console.log('Form submitted:', completeFormData);
+
+        const jobLevels = formData.experienceLevel 
+            ? [jobLevelMap[formData.experienceLevel]]
+            : [];
+
+        // Prepare data for API - matching backend expectations
+        const submitData = {
+            major: formData.major,
+            graduationMonth: formData.graduationMonth,
+            graduationYear: Number(formData.graduationYear),
+            skills: formData.skills,
+            codingLanguages: formData.codingLanguages,
+            jobLevels: jobLevels,
+            employmentTypes: formData.employmentTypes,
+            workModes: formData.workModes,
+            preferredLocations: formData.preferredLocations,
+            companyStages: formData.companyStages,
+            jobRoles: formData.jobRoles,
+            industries: formData.industries,
+            minimumPay: Number(formData.pay),
+            payPeriod: formData.payPeriod,
+            resumeUrl: null, // Handle file upload separately if needed
+            jobStatus: 'ACTIVELY_LOOKING',
+            name: formData.name
+        };
+        console.log('Form submitted:', submitData);
         
         // Submit form data to API endpoint
         try {
@@ -344,7 +289,7 @@ export default function OnboardingPage() {
                     'Content-Type': 'application/json',
                 },
                 credentials: 'include', // Include cookies for authentication
-                body: JSON.stringify(completeFormData),
+                body: JSON.stringify(submitData),
             });
 
             const result = await response.json();
@@ -535,8 +480,8 @@ export default function OnboardingPage() {
                                             <div className="pb-6 border-b border-gray-200">
                                                 <BadgeSelector
                                                     options={JOB_TITLES}
-                                                    selectedItems={selectedJobs}
-                                                    onSelectionChange={setSelectedJobs}
+                                                    selectedItems={formData.jobRoles}
+                                                    onSelectionChange={(items) => setFormData(prev => ({ ...prev, jobRoles: items }))}
                                                     // onSelectionChange={(items) => setFormData(prev => ({ ...prev, jobTitles: items }))}
                                                     placeholder="Search job titles..."
                                                     // label="Job Titles"
@@ -577,8 +522,8 @@ export default function OnboardingPage() {
                                                     <input
                                                         type="checkbox"
                                                         name="fullTime"
-                                                        checked={formData.jobPreferences.fullTime}
-                                                        onChange={handleJobPreferenceChange}
+                                                        checked={formData.employmentTypes.includes('FULL_TIME')}
+                                                        onChange={() => toggleEmploymentType('FULL_TIME')}
                                                         className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-white rounded"
                                                     />
                                                     <span className="ml-2 text-white">Full-time</span>
@@ -587,8 +532,8 @@ export default function OnboardingPage() {
                                                     <input
                                                         type="checkbox"
                                                         name="partTime"
-                                                        checked={formData.jobPreferences.partTime}
-                                                        onChange={handleJobPreferenceChange}
+                                                        checked={formData.employmentTypes.includes('PART_TIME')}
+                                                        onChange={() => toggleEmploymentType('PART_TIME')}
                                                         className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-white rounded"
                                                     />
                                                     <span className="ml-2 text-white">Part-time</span>
@@ -597,8 +542,8 @@ export default function OnboardingPage() {
                                                     <input
                                                         type="checkbox"
                                                         name="contract"
-                                                        checked={formData.jobPreferences.contract}
-                                                        onChange={handleJobPreferenceChange}
+                                                        checked={formData.employmentTypes.includes('CONTRACT')}
+                                                        onChange={() => toggleEmploymentType('CONTRACT')}
                                                         className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-white rounded"
                                                     />
                                                     <span className="ml-2 text-white">Contract</span>
@@ -607,23 +552,13 @@ export default function OnboardingPage() {
                                                     <input
                                                         type="checkbox"
                                                         name="internship"
-                                                        checked={formData.jobPreferences.internship}
-                                                        onChange={handleJobPreferenceChange}
+                                                        checked={formData.employmentTypes.includes('TEMPORARY')}
+                                                        onChange={() => toggleEmploymentType('TEMPORARY')}
                                                         className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-white rounded"
                                                     />
                                                     <span className="ml-2 text-white">Internship</span>
                                                 </label>
-                                                <label className="flex items-center">
-                                                    <input
-                                                        type="checkbox"
-                                                        name="coOp"
-                                                        checked={formData.jobPreferences.coOp}
-                                                        onChange={handleJobPreferenceChange}
-                                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-white rounded"
-                                                    />
-                                                    <span className="ml-2 text-white">Co-op</span>
-                                                </label>
-                                            </div>
+                                            </div> 
                                         </div>
 
                                         <div>
@@ -635,8 +570,8 @@ export default function OnboardingPage() {
                                                     <input
                                                         type="checkbox"
                                                         name="remote"
-                                                        checked={formData.workLocations.remote}
-                                                        onChange={handleWorkLocationsChange}
+                                                        checked={formData.workModes.includes('REMOTE')}
+                                                        onChange={() => toggleWorkMode('REMOTE')}
                                                         className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-white rounded"
                                                     />
                                                     <span className="ml-2 text-white">Remote</span>
@@ -645,8 +580,8 @@ export default function OnboardingPage() {
                                                     <input
                                                         type="checkbox"
                                                         name="hybrid"
-                                                        checked={formData.workLocations.hybrid}
-                                                        onChange={handleWorkLocationsChange}
+                                                        checked={formData.workModes.includes('HYBRID')}
+                                                        onChange={() => toggleWorkMode('HYBRID')}
                                                         className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-white rounded"
                                                     />
                                                     <span className="ml-2 text-white">Hybrid</span>
@@ -655,8 +590,8 @@ export default function OnboardingPage() {
                                                     <input
                                                         type="checkbox"
                                                         name="inPerson"
-                                                        checked={formData.workLocations.inPerson}
-                                                        onChange={handleWorkLocationsChange}
+                                                        checked={formData.workModes.includes('IN_PERSON')}
+                                                        onChange={() => toggleWorkMode('IN_PERSON')}
                                                         className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-white rounded"
                                                     />
                                                     <span className="ml-2 text-white">In Person</span>
@@ -671,53 +606,16 @@ export default function OnboardingPage() {
                                             <AutocompleteInput
                                                 label="Country"
                                                 options={countries}
-                                                value={selectedCountry}
-                                                onChange={setSelectedCountry}
-                                                onSelect={setSelectedCountry}
+                                                value={formData.preferredLocations[0] || ''}
+                                                onChange={(value) => setFormData(prev => ({ ...prev, preferredLocations: [value] }))}
+                                                onSelect={(value) => setFormData(prev => ({ ...prev, preferredLocations: [value] }))}
                                                 placeholder="e.g., United States, Canada, or your own..."
                                                 maxSuggestions={5}
                                             />
                                         </div>
                                         {/* TODO: Add in cities - use an api to do this? */}
 
-                                        <div>
-                                            <label className="block text-sm font-medium text-white mb-2">
-                                                What company stages are you intersted in? *
-                                            </label>
-                                            <div className="space-y-2">
-                                                <label className="flex items-center">
-                                                    <input
-                                                        type="checkbox"
-                                                        name="startup"
-                                                        checked={formData.companyStages.startup}
-                                                        onChange={handleCompanyStagesChange}
-                                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-white rounded"
-                                                    />
-                                                    <span className="ml-2 text-white">Startup</span>
-                                                </label>
-                                                <label className="flex items-center">
-                                                    <input
-                                                        type="checkbox"
-                                                        name="earlyStage"
-                                                        checked={formData.companyStages.earlyStage}
-                                                        onChange={handleCompanyStagesChange}
-                                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-white rounded"
-                                                    />
-                                                    <span className="ml-2 text-white">Early Stage</span>
-                                                </label>
-                                                <label className="flex items-center">
-                                                    <input
-                                                        type="checkbox"
-                                                        name="publicTech"
-                                                        checked={formData.companyStages.publicTech}
-                                                        onChange={handleCompanyStagesChange}
-                                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-white rounded"
-                                                    />
-                                                    <span className="ml-2 text-white">Public Tech</span>
-                                                </label>
-
-                                            </div>
-                                        </div>
+                                        
 
 
                                         {/* 
@@ -739,167 +637,103 @@ export default function OnboardingPage() {
                                             </div>
                                         </div> */}
 
-                                        <div>
+                                                                                <div>
                                             <label className="block text-sm font-medium text-white mb-2">
-                                                What industries you intersted in? *
+                                                What company stages are you interested in? *
                                             </label>
                                             <div className="space-y-2">
                                                 <label className="flex items-center">
                                                     <input
                                                         type="checkbox"
-                                                        name="aerospace"
-                                                        checked={formData.industries.aerospace}
-                                                        onChange={handleIndustriesChange}
+                                                        checked={formData.companyStages.includes('Startups')}
+                                                        onChange={() => toggleCompanyStage('Startups')}
                                                         className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-white rounded"
                                                     />
-                                                    <span className="ml-2 text-white">Aerospace</span>
+                                                    <span className="ml-2 text-white">Startup</span>
                                                 </label>
                                                 <label className="flex items-center">
                                                     <input
                                                         type="checkbox"
-                                                        name="artsEntertainment"
-                                                        checked={formData.industries.artsEntertainment}
-                                                        onChange={handleIndustriesChange}
+                                                        checked={formData.companyStages.includes('Early_Stage')}
+                                                        onChange={() => toggleCompanyStage('Early_Stage')}
                                                         className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-white rounded"
                                                     />
-                                                    <span className="ml-2 text-white">Arts & Entertaiment</span>
+                                                    <span className="ml-2 text-white">Early Stage</span>
                                                 </label>
                                                 <label className="flex items-center">
                                                     <input
                                                         type="checkbox"
-                                                        name="defense"
-                                                        checked={formData.industries.defense}
-                                                        onChange={handleIndustriesChange}
+                                                        checked={formData.companyStages.includes('Public_Tech')}
+                                                        onChange={() => toggleCompanyStage('Public_Tech')}
                                                         className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-white rounded"
                                                     />
-                                                    <span className="ml-2 text-white">Defense</span>
+                                                    <span className="ml-2 text-white">Public Tech</span>
                                                 </label>
                                                 <label className="flex items-center">
                                                     <input
                                                         type="checkbox"
-                                                        name="education"
-                                                        checked={formData.industries.education}
-                                                        onChange={handleIndustriesChange}
+                                                        checked={formData.companyStages.includes('Faang')}
+                                                        onChange={() => toggleCompanyStage('Faang')}
                                                         className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-white rounded"
                                                     />
-                                                    <span className="ml-2 text-white">Education</span>
+                                                    <span className="ml-2 text-white">FAANG</span>
                                                 </label>
-                                                <label className="flex items-center">
-                                                    <input
-                                                        type="checkbox"
-                                                        name="energy"
-                                                        checked={formData.industries.energy}
-                                                        onChange={handleIndustriesChange}
-                                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-white rounded"
-                                                    />
-                                                    <span className="ml-2 text-white">Energy</span>
-                                                </label>
-                                                <label className="flex items-center">
-                                                    <input
-                                                        type="checkbox"
-                                                        name="financeInsurance"
-                                                        checked={formData.industries.financeInsurance}
-                                                        onChange={handleIndustriesChange}
-                                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-white rounded"
-                                                    />
-                                                    <span className="ml-2 text-white">Finance/Insurance</span>
-                                                </label>
-                                                <label className="flex items-center">
-                                                    <input
-                                                        type="checkbox"
-                                                        name="governmentPublicAdministration"
-                                                        checked={formData.industries.governmentPublicAdministration}
-                                                        onChange={handleIndustriesChange}
-                                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-white rounded"
-                                                    />
-                                                    <span className="ml-2 text-white">Government & Public Administration</span>
-                                                </label>
-                                                <label className="flex items-center">
-                                                    <input
-                                                        type="checkbox"
-                                                        name="healthcare"
-                                                        checked={formData.industries.healthcare}
-                                                        onChange={handleIndustriesChange}
-                                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-white rounded"
-                                                    />
-                                                    <span className="ml-2 text-white">Healthcare</span>
-                                                </label>
-                                                <label className="flex items-center">
-                                                    <input
-                                                        type="checkbox"
-                                                        name="informationTechnology"
-                                                        checked={formData.industries.informationTechnology}
-                                                        onChange={handleIndustriesChange}
-                                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-white rounded"
-                                                    />
-                                                    <span className="ml-2 text-white">Information Technology</span>
-                                                </label>
-                                                <label className="flex items-center">
-                                                    <input
-                                                        type="checkbox"
-                                                        name="manufacturing"
-                                                        checked={formData.industries.manufacturing}
-                                                        onChange={handleIndustriesChange}
-                                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-white rounded"
-                                                    />
-                                                    <span className="ml-2 text-white">Manufacturing</span>
-                                                </label>
-                                                <label className="flex items-center">
-                                                    <input
-                                                        type="checkbox"
-                                                        name="mediaCommunication"
-                                                        checked={formData.industries.mediaCommunication}
-                                                        onChange={handleIndustriesChange}
-                                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-white rounded"
-                                                    />
-                                                    <span className="ml-2 text-white">Media & Communication</span>
-                                                </label>
-                                                <label className="flex items-center">
-                                                    <input
-                                                        type="checkbox"
-                                                        name="professionalBusinessServices"
-                                                        checked={formData.industries.professionalBusinessServices}
-                                                        onChange={handleIndustriesChange}
-                                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-white rounded"
-                                                    />
-                                                    <span className="ml-2 text-white">Professional & Buisness Services</span>
-                                                </label>
-
-                                                <label className="flex items-center">
-                                                    <input
-                                                        type="checkbox"
-                                                        name="retail"
-                                                        checked={formData.industries.retail}
-                                                        onChange={handleIndustriesChange}
-                                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-white rounded"
-                                                    />
-                                                    <span className="ml-2 text-white">Retail</span>
-                                                </label>
-
+                                            </div>
+                                        </div>
+                                        
+                                      <div>
+                                            <label className="block text-sm font-medium text-white mb-2">
+                                                What industries are you interested in? *
+                                            </label>
+                                            <div className="space-y-2">
+                                                {[
+                                                    'Aerospace',
+                                                    'Arts & Entertainment',
+                                                    'Defense',
+                                                    'Education',
+                                                    'Energy',
+                                                    'Finance & Insurance',
+                                                    'Government & Public Administration',
+                                                    'Healthcare',
+                                                    'Information Technology',
+                                                    'Manufacturing',
+                                                    'Media & Communication',
+                                                    'Professional & Business Services',
+                                                    'Retail'
+                                                ].map(industry => (
+                                                    <label key={industry} className="flex items-center">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={formData.industries.includes(industry)}
+                                                            onChange={() => toggleIndustry(industry)}
+                                                            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-white rounded"
+                                                        />
+                                                        <span className="ml-2 text-white">{industry}</span>
+                                                    </label>
+                                                ))}
                                             </div>
                                         </div>
 
                                         <div>
                                             <label className="block text-sm font-medium text-white mb-2">
-                                                What is the minimum pay you are looking for *
+                                                What is the minimum pay you are looking for? *
                                             </label>
                                             <input
-                                                // type="number"
+                                                type="number"
                                                 id="pay"
                                                 name="pay"
-                                                value={formData.pay}
+                                                value={formData.pay || ''}
                                                 onChange={handleInputChange}
                                                 required
-                                                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                                                 placeholder="$"
                                             />
-                                            {/* TODO: add pay and pay period here */}
 
                                             <div className="flex gap-3 mt-2 w-2">
                                                 <button
                                                     type="button"
-                                                    onClick={() => setPayType('hourly')}
-                                                    className={`flex-1 px-2 py-1 rounded-full text-sm font-medium transition-all ${payType === 'hourly'
+                                                    onClick={() => setFormData(prev => ({ ...prev, payPeriod: 'HOURLY' }))}
+                                                    className={`flex-1 px-2 py-1 rounded-full text-sm font-medium transition-all ${formData.payPeriod === 'HOURLY'
                                                         ? 'bg-blue-100 text-blue-800 border-2 border-blue-400'
                                                         : 'bg-gray-100 text-gray-600 border-2 border-gray-300 hover:bg-gray-200'
                                                         }`}
@@ -909,22 +743,16 @@ export default function OnboardingPage() {
 
                                                 <button
                                                     type="button"
-                                                    onClick={() => setPayType('yearly')}
-                                                    className={`flex-1 px-2 py-1 rounded-full text-sm font-medium transition-all ${payType === 'yearly'
+                                                    onClick={() => setFormData(prev => ({ ...prev, payPeriod: 'YEARLY' }))}
+                                                    className={`flex-1 px-2 py-1 rounded-full text-sm font-medium transition-all ${formData.payPeriod === 'YEARLY'
                                                         ? 'bg-blue-100 text-blue-800 border-2 border-blue-400'
                                                         : 'bg-gray-100 text-gray-600 border-2 border-gray-300 hover:bg-gray-200'
                                                         }`}
                                                 >
                                                     Yearly
                                                 </button>
-
-                                                {/* <div className="p-4 bg-gray-50 rounded-lg text-gray-600">
-                                                Selected: <strong className="text-gray-900 capitalize">{payType}</strong>
-                                            </div> */}
                                             </div>
                                         </div>
-
-
                                     </div>
                                 )}
 
@@ -943,11 +771,9 @@ export default function OnboardingPage() {
                                             <div className="pb-6 border-b border-gray-200">
                                                 <BadgeSelector
                                                     options={CODING_LANGUAGES}
-                                                    selectedItems={selectedCodingLanguages}
-                                                    onSelectionChange={setSelectedCodingLanguages}
+                                                    selectedItems={formData.codingLanguages}
+                                                    onSelectionChange={(items) => setFormData(prev => ({ ...prev, codingLanguages: items }))}
                                                     placeholder="Search coding languages..."
-                                                    // label="cCding Languages
-                                                    // description="What types of roles are you interested in?"
                                                     maxSuggestions={5}
                                                     allowCustom={true}
                                                 />

@@ -1,6 +1,7 @@
 'use client'
 
 import { signIn, signOut } from "next-auth/react";
+import { useRouter } from "next/navigation"
 
 interface ButtonProps {
     className?: string;
@@ -8,8 +9,9 @@ interface ButtonProps {
 }
 
 export const LoginButton = ({ className = 'navbar-login-btn', children }: ButtonProps) => {
+    const router = useRouter()
     return (
-        <button onClick={() => signIn()} className={className}>
+        <button onClick={() => router.push('/login')} className={className}>
             {children || 'LOGIN'}
         </button>
 
