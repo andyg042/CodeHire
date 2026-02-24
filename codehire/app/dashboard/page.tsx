@@ -41,13 +41,60 @@
 
 import { useState } from "react";
 import jobsData from "../../data/jobs.json";
-// import { auth } from '@/auth';
-// import { redirect } from 'next/navigation';
+import { auth } from '@/auth';
+import { redirect } from 'next/navigation';
+import SearchCheckboxes from "../components/SearchCheckboxes";
 
 export default function Jobs() {
 
   // Initialize state with JSON data
   const [jobs] = useState(jobsData);
+  const [selectedCodingLanguages, setSelectedCodingLanguages] = useState<string[]>([]);
+  const [selectedCountry, setSelectedCountry] = useState<string[]>([]);
+
+
+  const CODING_LANGUAGES = [
+    'JavaScript',
+    'TypeScript',
+    'Python',
+    'Java',
+    'C++',
+    'C#',
+    'Ruby',
+    'React',
+    'HTML',
+    'CSS',
+    'Go',
+    'Rust',
+    'Swift',
+    'Kotlin',
+    'PHP',
+    'SQL',
+    'R',
+    'Scala',
+    'Matlab',
+    'SQL',
+    'PyTorch',
+    'TensorFlow',
+    'Pandas',
+    'NumPy',
+  ];
+
+  const countries = [
+    'United States',
+    'United Kingdom',
+    'Canada',
+    'Australia',
+    'Germany',
+    'France',
+    'Italy',
+    'Spain',
+    'Japan',
+    'China',
+    'India',
+    'Brazil',
+    'Mexico',
+  ];
 
   // Filter state
   const [filters, setFilters] = useState({
@@ -103,17 +150,53 @@ export default function Jobs() {
     </label>
   );
 
+  //extract the coding languages and libraries from job description and display them in pill-shaped badges
+  const extractLanguages = (jobQualifications: string[]) => {
+    let descriptionLanguages: string[] = [];
+
+    for (const sentence of jobQualifications) {
+      let result = sentence.replace(/[.,]/g, " "); //remove commas and periods
+      const words: string[] = result.split(" ");
+
+      //search word list for coding languages
+      words.forEach((word) => {
+        CODING_LANGUAGES.forEach((language) => {
+          if (word.toUpperCase() === language.toUpperCase()) {
+            if (!descriptionLanguages.includes(word)) {
+              //add to list
+              descriptionLanguages.push(language);
+            }
+          }
+        });
+      });
+    }
+
+    return (
+      <div className="flex flex-wrap gap-2">
+
+        {/* the .map() loops over the array and returns a new array, an array of <span> elements - use map to render an array in reach instead of .forEach, which doesn't return anything */}
+        {/* rendering a list with .map(), Rach requires each item to have a unique key prop - how react updeates the UI effeicntly w/ out have ing to rerender everything */}
+        {descriptionLanguages.map((language) => (
+          < span
+            key={language}
+            className="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm" >
+            {language}
+          </span >
+        ))
+        }
+      </div >
+
+    )
+  }
+
+
+
 
   return (
 
     <div className="max-w-7xl mx-auto p-6">
       {/* Contains everything */}
       <div className="flex flex-col gap-5">
-
-        {/* Search bar div */}
-        <div className="bg-[#313749] rounded-lg shadow p-4">
-          <p className="text-lg font-semibold">Search Bar</p>
-        </div>
 
         {/* Filters & Job Card List */}
         <div className="flex flex-row gap-5">
@@ -147,15 +230,36 @@ export default function Jobs() {
                 </div>
 
                 <div className="space-y-2.5">
-                  <div className="bg-[#313749] space-y-2.5 shadow border border-gray-300 rounded px-3 py-2 focus:outline-none ">
-                    <p className="text-sm font-semibold">Search Bar</p>
-                  </div>
-                  <input
+
+                  {/* <input
                     type="text"
                     name="locationQuery"
                     value=""
                     className=" text-sm w-full bg-[#626C88] space-y-2.5 shadow border border-gray-300 rounded px-3 py-2  ">
-                  </input>
+                  </input> */}
+
+
+                  <div className="max-w-2xl mx-auto">
+                    <SearchCheckboxes
+                      options={countries}
+                      selectedItems={selectedCountry}
+                      onSelectionChange={setSelectedCountry}
+                      placeholder="Search for a location..."
+                      maxSuggestions={5}
+                    />
+
+                    {/* Display selected languages */}
+                    <div className="mt-8 p-4 bg-blue-50 rounded-lg">
+                      <h2 className="font-semibold mb-2">Selected Languages:</h2>
+                      <p className="text-sm text-gray-700">
+                        {selectedCountry.length > 0
+                          ? selectedCountry.join(', ')
+                          : 'None selected'}
+                      </p>
+                    </div>
+                  </div>
+
+
                   <FilterCheckbox category="locations" value="nyc" label="New York City" />
                   <FilterCheckbox category="locations" value="la" label="Los Angeles" />
                   <FilterCheckbox category="locations" value="sf" label="San Francisco" />
@@ -195,12 +299,42 @@ export default function Jobs() {
                   Languages
                 </h3>
                 <div className="space-y-2.5">
-                  <input
+                  {/* <input
                     type="text"
                     name="locationQuery"
                     value=""
-                    className=" text-sm w-full bg-[#626C88] space-y-2.5 shadow border border-gray-300 rounded px-3 py-2  ">
-                  </input>
+                    className=" text-sm w-full bg-[#626C88] space-y-2.5 shadow border border-gray-300 rounded px-3 py-2 "
+                    placeholder="Search Languages">
+                  </input> */}
+
+                  {/* <SearchCheckboxes
+                    options={CODING_LANGUAGES}
+                    selectedItems={selectedCodingLanguages}
+                    onSelectionChange={setSelectedCodingLanguages}
+                    allowCustom={false}
+
+                  /> */}
+
+                  <div className="max-w-2xl mx-auto">
+
+                    <SearchCheckboxes
+                      options={CODING_LANGUAGES}
+                      selectedItems={selectedCodingLanguages}
+                      onSelectionChange={setSelectedCodingLanguages}
+                      placeholder="Search for a language..."
+                      maxSuggestions={5}
+                    />
+
+                    {/* Display selected languages */}
+                    <div className="mt-8 p-4 bg-blue-50 rounded-lg">
+                      <h2 className="font-semibold mb-2">Selected Languages:</h2>
+                      <p className="text-sm text-gray-700">
+                        {selectedCodingLanguages.length > 0
+                          ? selectedCodingLanguages.join(', ')
+                          : 'None selected'}
+                      </p>
+                    </div>
+                  </div>
                   <FilterCheckbox category="languages" value="python" label="Python" />
                   <FilterCheckbox category="languages" value="cpp" label="C++" />
                   <FilterCheckbox category="languages" value="java" label="Java" />
@@ -221,15 +355,32 @@ export default function Jobs() {
 
               <div className="grid gap-4">
                 {filteredJobs.map((job) => (
+                  //whole job card
                   <div
                     key={job.job_id}
-                    className="border rounded-lg p-5 shadow-sm hover:shadow-md transition"
+                    className="border rounded-lg p-5 shadow-sm hover:shadow-md transition flex flex-row gap-3.5"
                   >
-                    <h2 className="text-xl font-semibold">{job.job_title}</h2>
-                    <p className="font-medium text-gray-700">{job.employer_name}</p>
-                    <p className="text-gray-500">
-                      {job.job_city}, {job.job_country}
-                    </p>
+                    <div>
+                      {job.employer_logo && (
+                        <img
+                          src={job.employer_logo}
+                          alt={`${job.employer_name} logo`}
+                          className="h-12 w-12 object-contain mb-2 border rounded-md"
+                        />
+                      )}
+                    </div>
+
+                    <div>
+                      <h2 className="text-xl font-semibold">{job.job_title}</h2>
+                      <p className="font-medium text-gray-700">{job.employer_name}</p>
+                      <p className="text-gray-500">
+                        {job.job_city}, {job.job_country}
+                      </p>
+                      <div className="mt-2">{extractLanguages(job.job_highlights.Qualifications)}</div>
+                      <div className="mt-2"> {((job.job_min_salary !== null) && (job.job_max_salary !== null)) ? (<div>${job.job_min_salary} - ${job.job_max_salary}</div>) : ("")} </div>
+                      <div className="mt-2  text-gray-700"> {job.job_posted_at} </div>
+                    </div>
+
                   </div>
                 ))}
               </div>
