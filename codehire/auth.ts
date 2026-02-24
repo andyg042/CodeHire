@@ -17,30 +17,35 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             password: { label: "Password", type: "password" },
         },
         async authorize(credentials) {
-            if (!credentials.email || !credentials.password) {
-                return null;
-            }
-            const user = await prisma.user.findUnique({
-                where: { email: credentials.email as string }
-            });
+          try {
+              if (!credentials.email || !credentials.password) {
+                  return null;
+              }
+              const user = await prisma.user.findUnique({
+                  where: { email: credentials.email as string }
+              });
 
-            if (!user) {
-                return null;
-            }
+              if (!user) {
+                  return null;
+              }
 
-            const isPasswordValid = await compare(
-                credentials.password as string,
-                user.password
-            );
-            if (!isPasswordValid) {
-                return null;
-            }
+              const isPasswordValid = await compare(
+                  credentials.password as string,
+                  user.password
+              );
+              if (!isPasswordValid) {
+                  return null;
+              }
 
-            return {
-                id: user.id + '',
-                email: user.email,
-                name: `${user.firstName} ${user.lastName}`,
-            };
+              return {
+                  id: user.id + '',
+                  email: user.email,
+                  name: `${user.firstName} ${user.lastName}`,
+              };
+          } catch (error) {
+              console.error("Error in authorize:", error);
+              return null;
+          }
         },
     }),
 

@@ -41,8 +41,8 @@
 
 import { useState } from "react";
 import jobsData from "../../data/jobs.json";
-import { auth } from '@/auth';
-import { redirect } from 'next/navigation';
+// import { auth } from '@/auth';
+// import { redirect } from 'next/navigation';
 
 export default function Jobs() {
 

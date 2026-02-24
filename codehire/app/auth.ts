@@ -32,10 +32,14 @@ const { auth, handlers, signIn, signOut } = NextAuth({
           where: { email: credentials.email as string },
         })
 
+        // console.log("User found:", !!user)
+        // console.log("Has password:", !!user?.password)
+
         if (!user || !user.password) return null
 
         const isValid = await compare(credentials.password as string, user.password)
         if (!isValid) return null
+        // console.log("Password valid:", isValid)
 
         return {
             id: user.id + "",

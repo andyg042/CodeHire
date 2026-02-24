@@ -20,10 +20,8 @@ export async function proxy(request: Request) {
     url.pathname.startsWith("/api/auth")
 
   // Redirect unauthenticated users to YOUR signup page
-  if (!isLoggedIn && !isPublicRoute) {
-    return NextResponse.redirect(
-      new URL("/signup", url.origin)
-    )
+   if (!isLoggedIn && !isPublicRoute) {
+    return NextResponse.redirect(new URL("/signup", url.origin)) 
   }
 
   // Allow request to continue
