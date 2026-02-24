@@ -103,6 +103,7 @@ const COUNTRIES = [
 
 const DEFAULT_FILTERS: JobFilters = {
   experience: [],
+  employmentType: [],
   locations: [],
   workMode: [],
   languages: [],
@@ -229,6 +230,7 @@ export default function Jobs() {
 
   const hasActiveFilters =
     filters.experience.length > 0 ||
+    filters.employmentType.length > 0 ||
     filters.locations.length > 0 ||
     filters.workMode.length > 0 ||
     filters.languages.length > 0 ||
@@ -260,6 +262,19 @@ export default function Jobs() {
                   <FilterCheckbox category="experience" value="mid" label="Mid Level" />
                   <FilterCheckbox category="experience" value="senior" label="Senior Level" />
                   <FilterCheckbox category="experience" value="lead" label="Lead/Principal" />
+                </div>
+              </section>
+
+              {/* Employment Type */}
+              <section className="mb-6">
+                <h3 className="text-[#ede769] font-bold text-sm mb-3 uppercase tracking-wide">
+                  Employment Type
+                </h3>
+                <div className="space-y-2.5">
+                  <FilterCheckbox category="employmentType" value="fulltime" label="Full-time" />
+                  <FilterCheckbox category="employmentType" value="parttime" label="Part-time" />
+                  <FilterCheckbox category="employmentType" value="contract" label="Contractor" />
+                  <FilterCheckbox category="employmentType" value="internship" label="Internship" />
                 </div>
               </section>
 

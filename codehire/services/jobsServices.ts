@@ -6,11 +6,12 @@ import jobsData from "../data/jobs.json"
 
 export interface JobFilters {
     experience: string[];
+    employmentType: string[];
     locations: string[];
     workMode: string[];
     languages: string[];
     datePosted: string;
-    country: string
+    country: string[];
 }
 
 export interface Job {
@@ -18,6 +19,7 @@ export interface Job {
     job_title: string;
     employer_name: string;
     employer_logo: string | null;
+    job_employment_types: string[];
     job_city: string;
     job_state: string;
     job_country: string;
@@ -47,6 +49,8 @@ const inferExperienceLevel = (title: string): string => {
     if (t.includes("junior") || t.includes("jr")) return "entry";
     return "mid";
 }
+
+
 
 //------------------------
 //WORK MODE MAPPING
@@ -106,6 +110,24 @@ const extractLanguagesFromJob = (qualifications: string[] = []): string[] => {
     return [...found];
 };
 
+//------------------------
+//EMPLOYMENT TYPE  MAPPING
+//------------------------
+const findEmploymentTypes = (job: Job): string[] => {
+    const found = new Set<string>();
+    for (const item of job.job_employment_types) {
+        //add matches with the "value" in checkboxes
+        if (item.includes("FULLTIME")) found.add("fulltime");
+        if (item.includes("PARTTIME")) found.add("parttime");
+        if (item.includes("CONTRACTOR")) found.add("contractor");
+        if (item.includes("INTERNSHIP")) found.add("internship");
+    }
+    return [...found]
+
+
+}
+
+
 
 export async function fetchJobs(filters: JobFilters): Promise<Job[]> {
     //simulate async behavior so swappint ot a real fetch() later requires no refactoring
@@ -115,6 +137,8 @@ export async function fetchJobs(filters: JobFilters): Promise<Job[]> {
 
     //Experience filter
     if (filters.experience.length > 0) {
+        console.log(filters.experience)
+
         results = results.filter((job) =>
             filters.experience.includes(inferExperienceLevel(job.job_title))
         )
@@ -140,14 +164,25 @@ export async function fetchJobs(filters: JobFilters): Promise<Job[]> {
 
     // --- Language filter ---
     if (filters.languages.length > 0) {
+        console.log(filters.languages)
+
         results = results.filter((job) => {
-            const jobLangs = extractLanguagesFromJob(
-                job.job_highlights?.Qualifications
-            );
+            const jobLangs = extractLanguagesFromJob(job.job_highlights?.Qualifications);
             return filters.languages.some((lang) =>
                 jobLangs.map((l) => l.toUpperCase()).includes(lang.toUpperCase())
             );
         });
+    }
+
+    //--- Employment Type filter ---
+    if (filters.employmentType.length > 0) {
+        console.log(filters.employmentType)
+        results = results.filter((job) => {
+            const employmentTypes = findEmploymentTypes(job);
+            return filters.employmentType.some((type) =>
+                employmentTypes.includes(type)
+            );
+        })
     }
 
     // --- Date posted filter ---
