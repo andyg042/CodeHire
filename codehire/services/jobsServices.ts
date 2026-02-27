@@ -5,6 +5,7 @@
 import jobsData from "../data/jobs.json"
 
 export interface JobFilters {
+    query: string;
     experience: string[];
     employmentType: string[];
     locations: string[];
@@ -130,70 +131,101 @@ const findEmploymentTypes = (job: Job): string[] => {
 
 
 export async function fetchJobs(filters: JobFilters): Promise<Job[]> {
-    //simulate async behavior so swappint ot a real fetch() later requires no refactoring
-    await Promise.resolve();
 
-    let results = jobsData as Job[];
+    const params = new URLSearchParams()
 
-    //Experience filter
-    if (filters.experience.length > 0) {
-        console.log(filters.experience)
-
-        results = results.filter((job) =>
-            filters.experience.includes(inferExperienceLevel(job.job_title))
-        )
-    }
-
-    // //Country filter 
-    // if (filters.country.length > 0){
-    //     results = results.filter((job) =>
-    //     filters.country(
-    //         (c) => job.job_country?.toLowerCase() === c.toLocaleLowerCase() ||
-    //             c.toLowerCase() ==="united states" && job.job_country === "US"
-    //     )
-    //     );
-
+    // if (filters.query) {
+    //     params.set("query", filters.query)
     // }
 
-    // --- Work mode filter ---
-    if (filters.workMode.length > 0) {
-        results = results.filter((job) =>
-            filters.workMode.includes(inferWorkMode(job))
-        );
+    //each filter array gets appened as multiple values for the same key/category
+    filters.experience.forEach(e => params.append("experience", e));
+    filters.employmentType.forEach(e => params.append("employmentType", e));
+    filters.workMode.forEach(e => params.append("workMode", e));
+    filters.languages.forEach(e => params.append("languages", e));
+    // filters.country.forEach(e => params.append("country", e));
+    filters.locations.forEach(e => params.append("locations", e));
+    params.set("datePosted", filters.datePosted);
+
+    const res = await fetch(`/api/jobs/search?${params.toString()}`);
+
+    if (!res.ok) {
+        throw new Error(`API Error: ${res.status}`);
     }
 
-    // --- Language filter ---
-    if (filters.languages.length > 0) {
-        console.log(filters.languages)
+    const data = await res.json()
+    return data.data as Job[]
 
-        results = results.filter((job) => {
-            const jobLangs = extractLanguagesFromJob(job.job_highlights?.Qualifications);
-            return filters.languages.some((lang) =>
-                jobLangs.map((l) => l.toUpperCase()).includes(lang.toUpperCase())
-            );
-        });
-    }
 
-    //--- Employment Type filter ---
-    if (filters.employmentType.length > 0) {
-        console.log(filters.employmentType)
-        results = results.filter((job) => {
-            const employmentTypes = findEmploymentTypes(job);
-            return filters.employmentType.some((type) =>
-                employmentTypes.includes(type)
-            );
-        })
-    }
+    // ------------------------------------------------
+    // FILTERING WITH JSON DATA 
+    // ------------------------------------------------
 
-    // --- Date posted filter ---
-    if (filters.datePosted && filters.datePosted !== "all") {
-        results = results.filter((job) =>
-            isWithinDateRange(job.job_posted_at_datetime_utc, filters.datePosted)
-        );
-    }
+    //simulate async behavior so swappint ot a real fetch() later requires no refactoring
+    // await Promise.resolve();
 
-    return results;
-    // returns the filtered job array
+    // let results = jobsData as Job[];
+
+    // //Experience filter
+    // if (filters.experience.length > 0) {
+    //     console.log(filters.experience)
+
+    //     results = results.filter((job) =>
+    //         filters.experience.includes(inferExperienceLevel(job.job_title))
+    //     )
+    // }
+
+    // // //Country filter 
+    // // if (filters.country.length > 0){
+    // //     results = results.filter((job) =>
+    // //     filters.country(
+    // //         (c) => job.job_country?.toLowerCase() === c.toLocaleLowerCase() ||
+    // //             c.toLowerCase() ==="united states" && job.job_country === "US"
+    // //     )
+    // //     );
+
+    // // }
+
+    // // --- Work mode filter ---
+    // if (filters.workMode.length > 0) {
+    //     results = results.filter((job) =>
+    //         filters.workMode.includes(inferWorkMode(job))
+    //     );
+    // }
+
+    // // --- Language filter ---
+    // if (filters.languages.length > 0) {
+    //     console.log(filters.languages)
+
+    //     results = results.filter((job) => {
+    //         const jobLangs = extractLanguagesFromJob(job.job_highlights?.Qualifications);
+    //         return filters.languages.some((lang) =>
+    //             jobLangs.map((l) => l.toUpperCase()).includes(lang.toUpperCase())
+    //         );
+    //     });
+    // }
+
+    // //--- Employment Type filter ---
+    // if (filters.employmentType.length > 0) {
+    //     console.log(filters.employmentType)
+    //     results = results.filter((job) => {
+    //         const employmentTypes = findEmploymentTypes(job);
+    //         return filters.employmentType.some((type) =>
+    //             employmentTypes.includes(type)
+    //         );
+    //     })
+    // }
+
+    // // --- Date posted filter ---
+    // if (filters.datePosted && filters.datePosted !== "all") {
+    //     results = results.filter((job) =>
+    //         isWithinDateRange(job.job_posted_at_datetime_utc, filters.datePosted)
+    //     );
+    // }
+
+    // return results;
+    // // returns the filtered job array
+    // ------------------------------------------------
 
 }
 

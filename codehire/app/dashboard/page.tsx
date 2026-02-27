@@ -103,6 +103,7 @@ const COUNTRIES = [
 // });
 
 const DEFAULT_FILTERS: JobFilters = {
+  query: " ",
   experience: [],
   employmentType: [],
   locations: [],
@@ -116,11 +117,21 @@ export default function Jobs() {
 
   // Initialize state with JSON data
   // const [jobs] = useState(jobsData);
+
+
+
   const [jobs, setJobs] = useState<Job[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedCodingLanguages, setSelectedCodingLanguages] = useState<string[]>([]);
   const [selectedCountry, setSelectedCountry] = useState<string[]>([]);
   const [filters, setFilters] = useState<JobFilters>(DEFAULT_FILTERS);
+
+
+  useEffect(() => {
+    fetch("/api/jobs/search?query=machine learning engineer")
+      .then(res => res.json())
+      .then(data => setJobs(data.data));
+  }, []);
 
   // how set filter runs:
   // 1. updates the filters state value
@@ -261,6 +272,14 @@ export default function Jobs() {
           {/* Filter Sidebar */}
           <aside className="w-80 flex-shrink-0">
             <div className="bg-[#313749] rounded-lg shadow p-6 sticky top-6">
+
+              <input
+                type="text"
+                value={filters.query}
+                onChange={(e) => setFilters(prev => ({ ...prev, query: e.target.value }))}
+                placeholder="Search job titles..."
+                className="w-full bg-[#313749] border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
               <h2 className="text-2xl font-bold mb-6">Filters</h2>
 
               {/* Experience Level */}
