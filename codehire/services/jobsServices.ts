@@ -193,6 +193,7 @@ export async function fetchJobs(filters: JobFilters): Promise<Job[]> {
     }
 
     return results;
+    // returns the filtered job array
 
 }
 

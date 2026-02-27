@@ -145,7 +145,7 @@ export default function Jobs() {
   useEffect(() => {
     setIsLoading(true);
     fetchJobs(filters) //run this useEffect whenever filters changes - compares the value in [filters] between the current render and the previous render -> checks after every render whetehr it needs to run again 
-      .then(setJobs)
+      .then(setJobs) //after fetchJobs is run, then the jobs state updates
       .finally(() => setIsLoading(false));
   }, [filters]);
 
