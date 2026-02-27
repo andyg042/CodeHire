@@ -72,7 +72,7 @@ export default function SearchCheckboxes({
                     {selectedItems.map((item) => (
                         <div
                             key={item}
-                            className="flex items-center justify-between px-3 py-1"
+                            className="flex items-center justify-between py-1"
                         >
                             <label className="flex items-center gap-2 cursor-pointer flex-1">
                                 <input

@@ -39,100 +39,154 @@
 // }
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback, Component } from "react";
 import jobsData from "../../data/jobs.json";
 // import { auth } from '@/auth';
 // import { redirect } from 'next/navigation';
 import SearchCheckboxes from "../components/SearchCheckboxes";
+import { fetchJobs, Job, JobFilters } from "@/services/jobsServices";
+import { Changa_One, Redressed } from "next/font/google";
+
+
+
+
+const CODING_LANGUAGES = [
+  'JavaScript',
+  'TypeScript',
+  'Python',
+  'Java',
+  'C++',
+  'C#',
+  'Ruby',
+  'React',
+  'HTML',
+  'CSS',
+  'Go',
+  'Rust',
+  'Swift',
+  'Kotlin',
+  'PHP',
+  'SQL',
+  'R',
+  'Scala',
+  'Matlab',
+  'SQL',
+  'PyTorch',
+  'TensorFlow',
+  'Pandas',
+  'NumPy',
+];
+
+const COUNTRIES = [
+  'United States',
+  'United Kingdom',
+  'Canada',
+  'Australia',
+  'Germany',
+  'France',
+  'Italy',
+  'Spain',
+  'Japan',
+  'China',
+  'India',
+  'Brazil',
+  'Mexico',
+];
+
+// Filter state
+// const [filters, setFilters] = useState({
+//   experience: [] as string[],
+//   locations: [] as string[],
+//   workMode: [] as string[],
+//   languages: [] as string[],
+//   datePosted: 'most-recent'
+// });
+
+const DEFAULT_FILTERS: JobFilters = {
+  experience: [],
+  employmentType: [],
+  locations: [],
+  workMode: [],
+  languages: [],
+  country: [],
+  datePosted: "all",
+};
 
 export default function Jobs() {
 
   // Initialize state with JSON data
-  const [jobs] = useState(jobsData);
+  // const [jobs] = useState(jobsData);
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [selectedCodingLanguages, setSelectedCodingLanguages] = useState<string[]>([]);
   const [selectedCountry, setSelectedCountry] = useState<string[]>([]);
+  const [filters, setFilters] = useState<JobFilters>(DEFAULT_FILTERS);
 
+  // how set filter runs:
+  // 1. updates the filters state value
+  // 2. Triggers a re-render of the Component
+  // 3. after the re-render, Reach checks if anything in the dependency array change?
+  // 4. it sees the filters object is different from the last render:
+  // 5. so it runs the useEffect Body again 
 
-  const CODING_LANGUAGES = [
-    'JavaScript',
-    'TypeScript',
-    'Python',
-    'Java',
-    'C++',
-    'C#',
-    'Ruby',
-    'React',
-    'HTML',
-    'CSS',
-    'Go',
-    'Rust',
-    'Swift',
-    'Kotlin',
-    'PHP',
-    'SQL',
-    'R',
-    'Scala',
-    'Matlab',
-    'SQL',
-    'PyTorch',
-    'TensorFlow',
-    'Pandas',
-    'NumPy',
-  ];
+  //Synch Searchcheckboxes selections into th main filters object --
+  useEffect(() => {
+    setFilters((prev) => ({ ...prev, languages: selectedCodingLanguages }));
+  }, [selectedCodingLanguages]);
 
-  const countries = [
-    'United States',
-    'United Kingdom',
-    'Canada',
-    'Australia',
-    'Germany',
-    'France',
-    'Italy',
-    'Spain',
-    'Japan',
-    'China',
-    'India',
-    'Brazil',
-    'Mexico',
-  ];
+  useEffect(() => {
+    setFilters((prev) => ({ ...prev, country: selectedCountry }));
 
-  // Filter state
-  const [filters, setFilters] = useState({
-    experience: [] as string[],
-    locations: [] as string[],
-    workMode: [] as string[],
-    languages: [] as string[],
-    datePosted: 'most-recent'
-  });
+  }, [selectedCountry]
+  );
+
+  // ─── Fetch jobs whenever filters change ───
+  // When you switch to a real API, only jobsService.ts needs to change — not this.
+  useEffect(() => {
+    setIsLoading(true);
+    fetchJobs(filters) //run this useEffect whenever filters changes - compares the value in [filters] between the current render and the previous render -> checks after every render whetehr it needs to run again 
+      .then(setJobs) //after fetchJobs is run, then the jobs state updates
+      .finally(() => setIsLoading(false));
+  }, [filters]);
 
   // Handle checkbox changes
-  const handleCheckboxChange = (category: keyof typeof filters, value: string) => {
-    setFilters(prev => {
-      const updated = { ...prev };
-      const array = updated[category] as string[];
+  // const handleCheckboxChange = (category: keyof typeof filters, value: string) => {
+  //   setFilters(prev => {
+  //     const updated = { ...prev };
+  //     const array = updated[category] as string[];
 
-      if (array.includes(value)) {
-        (updated[category] as string[]) = array.filter(item => item !== value);
-      } else {
-        (updated[category] as string[]) = [...array, value];
-      }
+  //     if (array.includes(value)) {
+  //       (updated[category] as string[]) = array.filter(item => item !== value);
+  //     } else {
+  //       (updated[category] as string[]) = [...array, value];
+  //     }
 
-      return updated;
-    });
+  //     return updated;
+  //   });
+  // };
+
+  // ─── Handlers ───
+  const handleCheckboxChange = useCallback(
+    // function being passed into useCallback
+    (category: keyof JobFilters, value: string) => {
+      //React State setter - instad of passing a value directly - pass in a function with (prev) - react will call this function and hand it the current state as prev
+      setFilters((prev) => {
+        const current = prev[category] as string[]; //uses braket notation to look up propery of prev - equivelant to prev.experience or prev.employmentType --> then treat result as a string array
+        const updated = current.includes(value) // checking whether value already exists in the array
+          ? current.filter((item) => item !== value) //if it already contains he value --> create a new array with the value removed - .filter() loops over every time andkeeps items where the condition is true, keep everything except the mating value
+          : [...current, value]; //if item not in the array, create a new array with all the existing items in spread [...current] plus the new value appended at the end
+        return { ...prev, [category]: updated }; //...prev - keeps all the existing filters so nothing else changes, [category]: updated --> aka experience:updated
+        //...prev creates a BRAND NEW object every time - so that it compare the value to the previous state to see if anything changed
+      });
+    },
+    []
+  );
+
+  const handleClearFilters = () => {
+    setFilters(DEFAULT_FILTERS);
+    setSelectedCodingLanguages([]);
+    setSelectedCountry([]);
   };
-
-  // Filter jobs based on selected filters
-  const filteredJobs = jobs.filter(job => {
-    // Add your filtering logic here based on your job data structure
-    // For now, returning all jobs - you'll need to match against job properties
-
-    // Example filtering (adjust based on your actual job data structure):
-    // if (filters.experience.length > 0 && !filters.experience.includes(job.experience_level)) {
-    //   return false;
-    // }
-
-    return true;
-  });
 
   const FilterCheckbox = ({ category, value, label }: {
     category: keyof typeof filters,
@@ -150,9 +204,12 @@ export default function Jobs() {
     </label>
   );
 
+  //TODO: This is different - as badges using [...found].map
   //extract the coding languages and libraries from job description and display them in pill-shaped badges
   const extractLanguages = (jobQualifications: string[]) => {
-    let descriptionLanguages: string[] = [];
+    // let descriptionLanguages: string[] = [];
+    const found = new Set<string>();
+
 
     for (const sentence of jobQualifications) {
       let result = sentence.replace(/[.,]/g, " "); //remove commas and periods
@@ -160,36 +217,36 @@ export default function Jobs() {
 
       //search word list for coding languages
       words.forEach((word) => {
-        CODING_LANGUAGES.forEach((language) => {
-          if (word.toUpperCase() === language.toUpperCase()) {
-            if (!descriptionLanguages.includes(word)) {
-              //add to list
-              descriptionLanguages.push(language);
-            }
-          }
-        });
-      });
+        const match = CODING_LANGUAGES.find(
+          (lang) => word.toUpperCase() === lang.toUpperCase());
+        if (match) found.add(match);
+      })
+
     }
 
     return (
       <div className="flex flex-wrap gap-2">
-
-        {/* the .map() loops over the array and returns a new array, an array of <span> elements - use map to render an array in reach instead of .forEach, which doesn't return anything */}
-        {/* rendering a list with .map(), Rach requires each item to have a unique key prop - how react updeates the UI effeicntly w/ out have ing to rerender everything */}
-        {descriptionLanguages.map((language) => (
-          < span
-            key={language}
-            className="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm" >
-            {language}
-          </span >
-        ))
-        }
-      </div >
+        {[...found].map((lang: string) => (
+          <span
+            key={lang}
+            className="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
+          >
+            {lang}
+          </span>
+        ))}
+      </div>
 
     )
   }
 
-
+  const hasActiveFilters =
+    filters.experience.length > 0 ||
+    filters.employmentType.length > 0 ||
+    filters.locations.length > 0 ||
+    filters.workMode.length > 0 ||
+    filters.languages.length > 0 ||
+    filters.country.length > 0 ||
+    filters.datePosted !== "all";
 
 
   return (
@@ -219,6 +276,19 @@ export default function Jobs() {
                 </div>
               </section>
 
+              {/* Employment Type */}
+              <section className="mb-6">
+                <h3 className="text-[#ede769] font-bold text-sm mb-3 uppercase tracking-wide">
+                  Employment Type
+                </h3>
+                <div className="space-y-2.5">
+                  <FilterCheckbox category="employmentType" value="fulltime" label="Full-time" />
+                  <FilterCheckbox category="employmentType" value="parttime" label="Part-time" />
+                  <FilterCheckbox category="employmentType" value="contractor" label="Contractor" />
+                  <FilterCheckbox category="employmentType" value="internship" label="Internship" />
+                </div>
+              </section>
+
               {/* Locations - make into a search bar then have check boxes with locations */}
               <section className="mb-6">
                 <h3 className="text-yellow-600 font-bold text-sm mb-3 uppercase tracking-wide">
@@ -241,28 +311,17 @@ export default function Jobs() {
 
                   <div className="max-w-2xl mx-auto">
                     <SearchCheckboxes
-                      options={countries}
+                      options={COUNTRIES}
                       selectedItems={selectedCountry}
                       onSelectionChange={setSelectedCountry}
                       placeholder="Search for a location..."
-                      maxSuggestions={5}
+                    // maxSuggestions={5}
                     />
 
-                    {/* Display selected languages */}
-                    <div className="mt-8 p-4 bg-blue-50 rounded-lg">
-                      <h2 className="font-semibold mb-2">Selected Languages:</h2>
-                      <p className="text-sm text-gray-700">
-                        {selectedCountry.length > 0
-                          ? selectedCountry.join(', ')
-                          : 'None selected'}
-                      </p>
-                    </div>
                   </div>
-
-
-                  <FilterCheckbox category="locations" value="nyc" label="New York City" />
+                  {/* <FilterCheckbox category="locations" value="nyc" label="New York City" />
                   <FilterCheckbox category="locations" value="la" label="Los Angeles" />
-                  <FilterCheckbox category="locations" value="sf" label="San Francisco" />
+                  <FilterCheckbox category="locations" value="sf" label="San Francisco" /> */}
                 </div>
 
                 <div className="border-t border-gray-200 my-4"></div>
@@ -286,7 +345,7 @@ export default function Jobs() {
                 >
                   <option value="most-recent">Most Recent</option>
                   <option value="3-days">3 Days</option>
-                  <option value="week">Week</option>
+                  <option value="week">Past Week</option>
                   <option value="past-month"> Past month</option>
                   <option value="all">all</option>
 
@@ -326,21 +385,8 @@ export default function Jobs() {
                     />
 
                     {/* Display selected languages */}
-                    <div className="mt-8 p-4 bg-blue-50 rounded-lg">
-                      <h2 className="font-semibold mb-2">Selected Languages:</h2>
-                      <p className="text-sm text-gray-700">
-                        {selectedCodingLanguages.length > 0
-                          ? selectedCodingLanguages.join(', ')
-                          : 'None selected'}
-                      </p>
-                    </div>
+
                   </div>
-                  <FilterCheckbox category="languages" value="python" label="Python" />
-                  <FilterCheckbox category="languages" value="cpp" label="C++" />
-                  <FilterCheckbox category="languages" value="java" label="Java" />
-                  <FilterCheckbox category="languages" value="html" label="HTML" />
-                  <FilterCheckbox category="languages" value="css" label="CSS" />
-                  <FilterCheckbox category="languages" value="other" label="....." />
                 </div>
               </section>
             </div>
@@ -350,40 +396,50 @@ export default function Jobs() {
           <main className="flex-1">
             <div className="rounded-lg shadow p-6">
               <h1 className="text-3xl font-bold mb-6">
-                Job Listings ({filteredJobs.length})
+                {isLoading ? "Loading..." : `Job Listings (${jobs.length})`}
               </h1>
 
-              <div className="grid gap-4">
-                {filteredJobs.map((job) => (
-                  //whole job card
-                  <div
-                    key={job.job_id}
-                    className="border rounded-lg p-5 shadow-sm hover:shadow-md transition flex flex-row gap-3.5"
-                  >
-                    <div>
-                      {job.employer_logo && (
-                        <img
-                          src={job.employer_logo}
-                          alt={`${job.employer_name} logo`}
-                          className="h-12 w-12 object-contain mb-2 border rounded-md"
-                        />
-                      )}
-                    </div>
 
-                    <div>
-                      <h2 className="text-xl font-semibold">{job.job_title}</h2>
-                      <p className="font-medium text-gray-700">{job.employer_name}</p>
-                      <p className="text-gray-500">
-                        {job.job_city}, {job.job_country}
-                      </p>
-                      <div className="mt-2">{extractLanguages(job.job_highlights.Qualifications)}</div>
-                      <div className="mt-2"> {((job.job_min_salary !== null) && (job.job_max_salary !== null)) ? (<div>${job.job_min_salary} - ${job.job_max_salary}</div>) : ("")} </div>
-                      <div className="mt-2  text-gray-700"> {job.job_posted_at} </div>
-                    </div>
+              {isLoading ? (
+                <div className="text-gray-400 text-center py-12">Fetching jobs...</div>
+              ) : jobs.length === 0 ? (
+                <div className="text-gray-400 text-center py-12">
+                  No jobs match your filters. Try adjusting or clearing them.
+                </div>
+              ) : (
+                <div className="grid gap-4">
+                  {jobs.map((job) => (
+                    //whole job card
+                    <div
+                      key={job.job_id}
+                      className="border rounded-lg p-5 shadow-sm hover:shadow-md transition flex flex-row gap-3.5"
+                    >
+                      <div>
+                        {job.employer_logo && (
+                          <img
+                            src={job.employer_logo}
+                            alt={`${job.employer_name} logo`}
+                            className="h-12 w-12 object-contain mb-2 border rounded-md"
+                          />
+                        )}
+                      </div>
 
-                  </div>
-                ))}
-              </div>
+                      <div>
+                        <h2 className="text-xl font-semibold">{job.job_title}</h2>
+                        <p className="font-medium text-gray-700">{job.employer_name}</p>
+                        <p className="text-gray-500">
+                          {job.job_city}, {job.job_country}
+                        </p>
+                        {/* extractLanguages expects a sting [], so provide fall back empty array if undefined */}
+                        <div className="mt-2">{extractLanguages(job.job_highlights?.Qualifications ?? [])}</div>
+                        <div className="mt-2"> {((job.job_min_salary !== null) && (job.job_max_salary !== null)) ? (<div>${job.job_min_salary} - ${job.job_max_salary}</div>) : ("")} </div>
+                        <div className="mt-2  text-gray-700"> {job.job_posted_at} </div>
+                      </div>
+
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </main>
         </div>
