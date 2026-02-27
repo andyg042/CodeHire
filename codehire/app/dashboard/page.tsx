@@ -39,12 +39,13 @@
 // }
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, Component } from "react";
 import jobsData from "../../data/jobs.json";
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
 import SearchCheckboxes from "../components/SearchCheckboxes";
 import { fetchJobs, Job, JobFilters } from "@/services/jobsServices";
+import { Changa_One, Redressed } from "next/font/google";
 
 
 
@@ -117,9 +118,16 @@ export default function Jobs() {
   // const [jobs] = useState(jobsData);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [filters, setFilters] = useState<JobFilters>(DEFAULT_FILTERS);
   const [selectedCodingLanguages, setSelectedCodingLanguages] = useState<string[]>([]);
   const [selectedCountry, setSelectedCountry] = useState<string[]>([]);
+  const [filters, setFilters] = useState<JobFilters>(DEFAULT_FILTERS);
+
+  // how set filter runs:
+  // 1. updates the filters state value
+  // 2. Triggers a re-render of the Component
+  // 3. after the re-render, Reach checks if anything in the dependency array change?
+  // 4. it sees the filters object is different from the last render:
+  // 5. so it runs the useEffect Body again 
 
   //Synch Searchcheckboxes selections into th main filters object --
   useEffect(() => {
@@ -136,7 +144,7 @@ export default function Jobs() {
   // When you switch to a real API, only jobsService.ts needs to change — not this.
   useEffect(() => {
     setIsLoading(true);
-    fetchJobs(filters)
+    fetchJobs(filters) //run this useEffect whenever filters changes - compares the value in [filters] between the current render and the previous render -> checks after every render whetehr it needs to run again 
       .then(setJobs)
       .finally(() => setIsLoading(false));
   }, [filters]);
@@ -159,13 +167,16 @@ export default function Jobs() {
 
   // ─── Handlers ───
   const handleCheckboxChange = useCallback(
+    // function being passed into useCallback
     (category: keyof JobFilters, value: string) => {
+      //React State setter - instad of passing a value directly - pass in a function with (prev) - react will call this function and hand it the current state as prev
       setFilters((prev) => {
-        const current = prev[category] as string[];
-        const updated = current.includes(value)
-          ? current.filter((item) => item !== value)
-          : [...current, value];
-        return { ...prev, [category]: updated };
+        const current = prev[category] as string[]; //uses braket notation to look up propery of prev - equivelant to prev.experience or prev.employmentType --> then treat result as a string array
+        const updated = current.includes(value) // checking whether value already exists in the array
+          ? current.filter((item) => item !== value) //if it already contains he value --> create a new array with the value removed - .filter() loops over every time andkeeps items where the condition is true, keep everything except the mating value
+          : [...current, value]; //if item not in the array, create a new array with all the existing items in spread [...current] plus the new value appended at the end
+        return { ...prev, [category]: updated }; //...prev - keeps all the existing filters so nothing else changes, [category]: updated --> aka experience:updated
+        //...prev creates a BRAND NEW object every time - so that it compare the value to the previous state to see if anything changed
       });
     },
     []
@@ -273,7 +284,7 @@ export default function Jobs() {
                 <div className="space-y-2.5">
                   <FilterCheckbox category="employmentType" value="fulltime" label="Full-time" />
                   <FilterCheckbox category="employmentType" value="parttime" label="Part-time" />
-                  <FilterCheckbox category="employmentType" value="contract" label="Contractor" />
+                  <FilterCheckbox category="employmentType" value="contractor" label="Contractor" />
                   <FilterCheckbox category="employmentType" value="internship" label="Internship" />
                 </div>
               </section>
