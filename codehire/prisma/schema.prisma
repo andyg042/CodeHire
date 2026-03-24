@@ -34,7 +34,7 @@ enum WorkMode {
   REMOTE
   HYBRID
   IN_PERSON
-};
+}
 
 enum PayPeriod {
   HOURLY
